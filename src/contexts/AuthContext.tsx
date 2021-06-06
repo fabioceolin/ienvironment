@@ -5,12 +5,19 @@ import Router from "next/router";
 import { api } from "../services/apiClient";
 
 type User = {
+  id: string;
   login: string;
   email: string;
-  enable: boolean;
-  permissions: string[];
-  roles: string[];
+  name: string;
+  enabled: boolean;
+  role: string;
 };
+
+type LoginResponse = {
+  user: User;
+  token: string;
+  refreshToken: string;
+}
 
 type SignInCredentials = {
   login: string;
@@ -61,14 +68,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const { "ienvironment.token": token } = parseCookies();
-
+    
     if (token) {
       api
         .get("user/me")
         .then((response) => {
-          const { login, email, permissions, roles, enable } = response.data;
+          console.log(response.data)
+          const { id, name, login, email, role, enabled } = response.data.user;
 
-          setUser({ login, email, permissions, roles, enable });
+          setUser({ id, name, login, email, role, enabled });
         })
         .catch(() => {
           signOut();
@@ -78,12 +86,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function signIn({ login, password }: SignInCredentials) {
     try {
-      const response = await api.post("user/login", {
+      const response = await api.post<LoginResponse>("user/login", {
         login,
         password,
       });
 
-      const { email, enable, token, refreshToken, permissions, roles } = response.data;
+      const { token, refreshToken, user } = response.data;
+      console.log(response)
 
       setCookie(undefined, "ienvironment.token", token, {
         maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -95,11 +104,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       setUser({
-        login,
-        email,
-        enable,
-        permissions,
-        roles,
+        id: user.id,
+        name: user.name,
+        login: user.login,
+        email: user.email,
+        enabled: user.enabled,
+        role: user.role,
       });
 
       api.defaults.headers["Authorization"] = `Bearer ${token}`;

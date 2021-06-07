@@ -1,10 +1,10 @@
 import { Flex, SimpleGrid, Box, Text, theme } from '@chakra-ui/react';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import { Header } from '../../components/Header';
-import { Sidebar } from '../../components/Sidebar';
-import { setupAPIClient } from '../../services/api';
-import { withSSRAuth } from '../../utils/withSSRAuth';
+import { Header } from 'components/Header';
+import { Sidebar } from 'components/Sidebar';
+import { setupAPIClient } from 'services/api';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 const Chart = dynamic(() => import('react-apexcharts'), {
   ssr: false,

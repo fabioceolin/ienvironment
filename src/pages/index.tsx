@@ -5,10 +5,10 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FaUser, FaLock } from 'react-icons/fa';
 
-import { Input } from '../components/Form/Input';
+import { Input } from 'components/Form/Input';
 
-import { AuthContext } from '../contexts/AuthContext';
-import { withSSRGuest } from '../utils/withSSRGuest';
+import { AuthContext } from 'contexts/AuthContext';
+import { withSSRGuest } from 'utils/withSSRGuest';
 import { GetServerSideProps } from 'next';
 
 type SignInFormData = {

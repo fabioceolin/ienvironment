@@ -19,12 +19,11 @@ import {
 } from '@chakra-ui/react';
 import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 
-import { Header } from '../../components/Header';
-import { Pagination } from '../../components/Pagination';
-import { Sidebar } from '../../components/Sidebar';
-import { useUsers } from '../../hooks/useUsers';
-import { queryClient } from '../../services/queryClient';
-import { api } from '../../services/apiClient';
+import { Header } from 'components/Header';
+import { Sidebar } from 'components/Sidebar';
+import { useUsers } from 'hooks/useUsers';
+import { queryClient } from 'services/queryClient';
+import { api } from 'services/apiClient';
 
 export default function UserList() {
   const { data, isLoading, isFetching, error } = useUsers();

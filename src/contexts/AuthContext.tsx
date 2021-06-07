@@ -1,8 +1,8 @@
-import { useState, createContext, ReactNode, useEffect } from "react";
-import { setCookie, parseCookies, destroyCookie } from "nookies";
-import Router from "next/router";
+import { useState, createContext, ReactNode, useEffect } from 'react';
+import { setCookie, parseCookies, destroyCookie } from 'nookies';
+import Router from 'next/router';
 
-import { api } from "../services/apiClient";
+import { api } from '../services/apiClient';
 
 type User = {
   id: string;
@@ -17,7 +17,7 @@ type LoginResponse = {
   user: User;
   token: string;
   refreshToken: string;
-}
+};
 
 type SignInCredentials = {
   login: string;
@@ -40,12 +40,12 @@ export const AuthContext = createContext({} as AuthContextData);
 let authChannel: BroadcastChannel;
 
 export function signOut() {
-  destroyCookie(undefined, "ienvironment.token");
-  destroyCookie(undefined, "ienvironment.refreshToken");
+  destroyCookie(undefined, 'ienvironment.token');
+  destroyCookie(undefined, 'ienvironment.refreshToken');
 
-  authChannel.postMessage("signOut");
+  authChannel.postMessage('signOut');
 
-  Router.push("/");
+  Router.push('/');
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -53,11 +53,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAuthenticated = !!user;
 
   useEffect(() => {
-    authChannel = new BroadcastChannel("auth");
+    authChannel = new BroadcastChannel('auth');
 
     authChannel.onmessage = (message) => {
       switch (message.data) {
-        case "signOut":
+        case 'signOut':
           signOut();
           break;
         default:
@@ -67,13 +67,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   useEffect(() => {
-    const { "ienvironment.token": token } = parseCookies();
-    
+    const { 'ienvironment.token': token } = parseCookies();
+
     if (token) {
       api
-        .get("user/me")
+        .get('user/me')
         .then((response) => {
-          console.log(response.data)
+          console.log(response.data);
           const { id, name, login, email, role, enabled } = response.data.user;
 
           setUser({ id, name, login, email, role, enabled });
@@ -86,21 +86,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function signIn({ login, password }: SignInCredentials) {
     try {
-      const response = await api.post<LoginResponse>("user/login", {
+      const response = await api.post<LoginResponse>('user/login', {
         login,
         password,
       });
 
       const { token, refreshToken, user } = response.data;
-      console.log(response)
+      console.log(response);
 
-      setCookie(undefined, "ienvironment.token", token, {
+      setCookie(undefined, 'ienvironment.token', token, {
         maxAge: 60 * 60 * 24 * 30, // 30 days
-        path: "/",
+        path: '/',
       });
-      setCookie(undefined, "ienvironment.refreshToken", refreshToken, {
+      setCookie(undefined, 'ienvironment.refreshToken', refreshToken, {
         maxAge: 60 * 60 * 24 * 30, // 30 days
-        path: "/",
+        path: '/',
       });
 
       setUser({
@@ -112,9 +112,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         role: user.role,
       });
 
-      api.defaults.headers["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
-      Router.push("/dashboard");
+      Router.push('/dashboard');
     } catch (err) {
       console.log(err);
     }

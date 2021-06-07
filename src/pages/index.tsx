@@ -1,15 +1,15 @@
-import { useContext } from "react";
-import { Button, Flex, Stack } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { FaUser, FaLock } from "react-icons/fa";
+import { useContext } from 'react';
+import { Button, Flex, Stack } from '@chakra-ui/react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { FaUser, FaLock } from 'react-icons/fa';
 
-import { Input } from "../components/Form/Input";
+import { Input } from '../components/Form/Input';
 
-import { AuthContext } from "../contexts/AuthContext";
-import { withSSRGuest } from "../utils/withSSRGuest";
-import { GetServerSideProps } from "next";
+import { AuthContext } from '../contexts/AuthContext';
+import { withSSRGuest } from '../utils/withSSRGuest';
+import { GetServerSideProps } from 'next';
 
 type SignInFormData = {
   login: string;
@@ -17,8 +17,8 @@ type SignInFormData = {
 };
 
 const signInFormSchema = yup.object().shape({
-  login: yup.string().required("Login obrigatório"),
-  password: yup.string().required("Senha obrigatória"),
+  login: yup.string().required('Login obrigatório'),
+  password: yup.string().required('Senha obrigatória'),
 });
 
 export default function SignIn() {
@@ -52,7 +52,7 @@ export default function SignIn() {
             label="Username"
             icon={FaUser}
             error={errors.login}
-            {...register("login")}
+            {...register('login')}
           />
           <Input
             name="password"
@@ -60,7 +60,7 @@ export default function SignIn() {
             label="Senha"
             icon={FaLock}
             error={errors.password}
-            {...register("password")}
+            {...register('password')}
           />
         </Stack>
         <Button
@@ -77,8 +77,10 @@ export default function SignIn() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = withSSRGuest(async (ctx) => {
-  return {
-    props: {},
-  };
-});
+export const getServerSideProps: GetServerSideProps = withSSRGuest(
+  async (ctx) => {
+    return {
+      props: {},
+    };
+  }
+);

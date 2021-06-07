@@ -1,5 +1,5 @@
 type User = {
-  roles: string[];
+  role: string;
 };
 type ValidateUserPermissionsParams = {
   user: User;
@@ -11,7 +11,7 @@ export function validateUserPermissions({
   role,
 }: ValidateUserPermissionsParams) {
   if (role) {
-    return user.roles.includes(role);
+    return user.role === role;
   }
 
   return true;

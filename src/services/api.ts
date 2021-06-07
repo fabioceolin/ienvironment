@@ -1,7 +1,7 @@
-import axios, { AxiosError } from "axios";
-import { parseCookies, setCookie } from "nookies";
-import { signOut } from "../contexts/AuthContext";
-import { AuthTokenError } from "../errors/AuthTokenError";
+import axios, { AxiosError } from 'axios';
+import { parseCookies, setCookie } from 'nookies';
+import { signOut } from '../contexts/AuthContext';
+import { AuthTokenError } from '../errors/AuthTokenError';
 
 let isRefreshing = false;
 let failedRequestQueue = [];
@@ -10,9 +10,9 @@ export function setupAPIClient(ctx = undefined) {
   let cookies = parseCookies(ctx);
 
   const api = axios.create({
-    baseURL: "https://ienvironment.azurewebsites.net",
+    baseURL: 'https://ienvironment.azurewebsites.net',
     headers: {
-      Authorization: `Bearer ${cookies["ienvironment.token"]}`,
+      Authorization: `Bearer ${cookies['ienvironment.token']}`,
     },
   });
 
@@ -21,35 +21,35 @@ export function setupAPIClient(ctx = undefined) {
       return response;
     },
     (error: AxiosError) => {
-      console.log("erro api")
+      console.log('erro api');
       if (error.response.status === 401) {
-        if (error.response.data?.code === "token.expired") {
+        if (error.response.data?.code === 'token.expired') {
           cookies = parseCookies(ctx);
 
-          const { "ienvironment.refreshToken": oldRefreshToken } = cookies;
+          const { 'ienvironment.refreshToken': oldRefreshToken } = cookies;
           const originalConfig = error.config;
 
           if (!isRefreshing) {
             isRefreshing = true;
 
             api
-              .post("user/refresh", {
+              .post('user/refresh', {
                 refreshToken: oldRefreshToken,
               })
               .then((response) => {
                 const { token, refreshToken } = response.data;
 
-                setCookie(ctx, "ienvironment.token", token, {
+                setCookie(ctx, 'ienvironment.token', token, {
                   maxAge: 60 * 60 * 24 * 30, // 30 days
-                  path: "/",
+                  path: '/',
                 });
 
-                setCookie(ctx, "ienvironment.refreshToken", refreshToken, {
+                setCookie(ctx, 'ienvironment.refreshToken', refreshToken, {
                   maxAge: 60 * 60 * 24 * 30, // 30 days
-                  path: "/",
+                  path: '/',
                 });
 
-                api.defaults.headers["Authorization"] = `Bearer ${token}`;
+                api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
                 failedRequestQueue.forEach((request) => {
                   request.onSuccess(token);
@@ -74,7 +74,7 @@ export function setupAPIClient(ctx = undefined) {
           return new Promise((resolve, reject) => {
             failedRequestQueue.push({
               onSuccess: (token: string) => {
-                originalConfig.headers["Authorization"] = `Bearer ${token}`;
+                originalConfig.headers['Authorization'] = `Bearer ${token}`;
 
                 resolve(api(originalConfig));
               },
@@ -87,7 +87,7 @@ export function setupAPIClient(ctx = undefined) {
           if (process.browser) {
             signOut();
           } else {
-            return Promise.reject(new AuthTokenError())
+            return Promise.reject(new AuthTokenError());
           }
         }
       }

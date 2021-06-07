@@ -21,7 +21,7 @@ export function setupAPIClient(ctx = undefined) {
       return response;
     },
     (error: AxiosError) => {
-      console.log('erro api');
+      console.log('erro api', error);
       if (error.response.status === 401) {
         if (error.response.data?.code === 'token.expired') {
           cookies = parseCookies(ctx);

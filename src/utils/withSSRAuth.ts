@@ -23,10 +23,6 @@ export function withSSRAuth<P>(
       const cookies = parseCookies(ctx);
       const token = cookies['ienvironment.token'];
 
-      console.log('SSRAuth');
-      console.log(cookies);
-      console.log(token);
-
       if (!token) {
         return {
           redirect: {
@@ -36,11 +32,8 @@ export function withSSRAuth<P>(
         };
       }
 
-      console.log('2');
-      console.log(options);
-
       if (options) {
-        const user = decode<{ roles: string[] }>(token);
+        const user = decode<{ role: string }>(token);
         const { role } = options;
 
         const userHasValidPermissions = validateUserPermissions({
@@ -58,15 +51,13 @@ export function withSSRAuth<P>(
         }
       }
     } catch (error) {
-      console.log('3');
-      console.log(error);
+      console.log('withSSRAuth: ', error);
     }
 
     try {
       return await fn(ctx);
     } catch (error) {
-      console.log('4');
-      console.log(error);
+      console.log('withSSRAuth: Forced logout', error);
       if (error instanceof AuthTokenError) {
         console.log('Destroy cookie');
         destroyCookie(ctx, 'ienvironment.token');

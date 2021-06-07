@@ -10,9 +10,6 @@ export function withSSRGuest<P>(fn: GetServerSideProps<P>): GetServerSideProps {
     ctx: GetServerSidePropsContext
   ): Promise<GetServerSidePropsResult<P>> => {
     const cookies = parseCookies(ctx);
-    console.log('SSRGuest');
-    console.log(cookies);
-    console.log(cookies['ienvironment.token']);
 
     if (cookies['ienvironment.token']) {
       return {

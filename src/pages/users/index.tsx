@@ -24,9 +24,12 @@ import { Sidebar } from 'components/Sidebar';
 import { useUsers } from 'hooks/useUsers';
 import { queryClient } from 'services/queryClient';
 import { api } from 'services/apiClient';
+import { role } from 'enums/role';
 
 export default function UserList() {
   const { data, isLoading, isFetching, error } = useUsers();
+
+  console.log(data);
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -92,7 +95,7 @@ export default function UserList() {
                       <Checkbox colorScheme="pink" />
                     </Th>
                     <Th>Usuário</Th>
-                    {isWideVersion && <Th>Data de cadastro</Th>}
+                    {isWideVersion && <Th>Permissão</Th>}
                     <Th width="8"></Th>
                   </Tr>
                 </Thead>
@@ -100,7 +103,7 @@ export default function UserList() {
                 <Tbody>
                   {data.map((user) => {
                     return (
-                      <Tr key={user.id}>
+                      <Tr key={user.Id}>
                         <Td px={['4', '4', '6']} color="gray.300" width="8">
                           <Checkbox colorScheme="pink" />
                         </Td>
@@ -110,14 +113,22 @@ export default function UserList() {
                               color="purple.400"
                               // onMouseEnter={() => handlePrefetchUser(user.id)}
                             >
-                              <Text fontWeight="Bold">{user.name}</Text>
+                              <Text fontWeight="Bold">{user.Name}</Text>
                             </Link>
                             <Text fontSize="sm" color="gray.300">
-                              {user.email}
+                              {user.Email}
                             </Text>
                           </Box>
                         </Td>
-                        {isWideVersion && <Td>{user.createdAt}</Td>}
+                        {isWideVersion && (
+                          <Td>
+                            <Text color="gray.300">
+                              {user.Role === role.Adm
+                                ? 'Administrator'
+                                : 'User'}
+                            </Text>
+                          </Td>
+                        )}
                         <Td>
                           <Button
                             as="a"

@@ -17,12 +17,15 @@ import { useMutation } from 'react-query';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
+import { Select } from 'components/Form/Select';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
+import { role } from 'enums/role';
 
 type CreateUserFormData = {
   name: string;
+  login: string;
   email: string;
   password: string;
   password_confirmation: string;
@@ -30,6 +33,7 @@ type CreateUserFormData = {
 
 const CreateUserFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
+  login: yup.string().required('Login obrigatório'),
   email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
   password: yup
     .string()
@@ -44,7 +48,7 @@ export default function CreateUser() {
   const router = useRouter();
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
-      const response = await api.post('users', {
+      const response = await api.post('user/create', {
         user: {
           ...user,
           created_at: new Date(),
@@ -109,6 +113,24 @@ export default function CreateUser() {
                 error={errors.email}
                 {...register('email')}
               />
+            </SimpleGrid>
+
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Input
+                name="login"
+                label="Login"
+                error={errors.login}
+                {...register('login')}
+              />
+              <Select
+                name="select"
+                label="Permissão"
+                error={errors.role}
+                {...register('role')}
+              >
+                <option value={role.Adm}>Administrator</option>
+                <option value={role.User}>User</option>
+              </Select>
             </SimpleGrid>
 
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">

@@ -1,4 +1,11 @@
-import { useState, createContext, ReactNode, useEffect } from 'react';
+import {
+  useState,
+  createContext,
+  ReactNode,
+  useEffect,
+  useCallback,
+} from 'react';
+import { useToast } from '@chakra-ui/react';
 import { setCookie, parseCookies, destroyCookie } from 'nookies';
 import Router from 'next/router';
 
@@ -51,6 +58,7 @@ export function signOut() {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User>();
   const isAuthenticated = !!user;
+  const toast = useToast();
 
   useEffect(() => {
     authChannel = new BroadcastChannel('auth');
@@ -73,7 +81,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       api
         .get('user/me')
         .then((response) => {
-          console.log(response.data);
           const { id, name, login, email, role, enabled } = response.data.user;
 
           setUser({ id, name, login, email, role, enabled });
@@ -84,15 +91,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  async function signIn({ login, password }: SignInCredentials) {
+  const signIn = useCallback(async ({ login, password }: SignInCredentials) => {
     try {
       const response = await api.post<LoginResponse>('user/login', {
         login,
         password,
       });
 
+      toast({
+        title: 'Autenticação.',
+        description: 'Login realizado com sucesso.',
+        status: 'success',
+        position: 'top-right',
+        isClosable: true,
+      });
       const { token, refreshToken, user } = response.data;
-      console.log(response);
 
       setCookie(undefined, 'ienvironment.token', token, {
         maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -116,9 +129,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       Router.push('/dashboard');
     } catch (err) {
+      toast({
+        title: 'Autenticação.',
+        description: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+      });
       console.log(err);
     }
-  }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ signIn, signOut, isAuthenticated, user }}>

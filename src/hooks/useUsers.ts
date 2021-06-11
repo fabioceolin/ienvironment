@@ -15,8 +15,6 @@ type Users = {
 export async function getUsers(): Promise<Users[]> {
   const { data } = await api.get<Users[]>('user/getallusers');
 
-  console.log(data);
-
   const users = data.map((user) => {
     return {
       Id: user.Id,

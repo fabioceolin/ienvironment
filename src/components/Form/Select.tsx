@@ -7,6 +7,7 @@ import {
   FormControl,
   FormErrorMessage,
   SelectProps as ChakraSelectProps,
+  DarkMode,
 } from '@chakra-ui/react';
 import { ElementType, forwardRef, ForwardRefRenderFunction } from 'react';
 import { FieldError } from 'react-hook-form';
@@ -34,19 +35,21 @@ const SelectBase: ForwardRefRenderFunction<HTMLSelectElement, SelectProps> = (
             children={<Icon as={icons} />}
           />
         )}
-        <ChakraSelect
-          name={name}
-          id={name}
-          focusBorderColor="pink.500"
-          bgColor="gray.900"
-          variant="filled"
-          _hover={{ bgColor: 'gray.900' }}
-          size="lg"
-          ref={ref}
-          {...rest}
-        >
-          {children}
-        </ChakraSelect>
+        <DarkMode>
+          <ChakraSelect
+            name={name}
+            id={name}
+            focusBorderColor="pink.500"
+            bgColor="gray.900"
+            variant="filled"
+            _hover={{ bgColor: 'gray.900' }}
+            size="lg"
+            ref={ref}
+            {...rest}
+          >
+            {children}
+          </ChakraSelect>
+        </DarkMode>
       </InputGroup>
 
       {!!error && <FormErrorMessage>{error.message}</FormErrorMessage>}

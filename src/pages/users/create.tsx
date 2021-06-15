@@ -7,7 +7,9 @@ import {
   SimpleGrid,
   HStack,
   Button,
+  useToast,
 } from '@chakra-ui/react';
+import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,19 +19,24 @@ import { useMutation } from 'react-query';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
+import { Select } from 'components/Form/Select';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
+import { role } from 'enums/role';
 
 type CreateUserFormData = {
   name: string;
+  login: string;
   email: string;
   password: string;
   password_confirmation: string;
+  role: number;
 };
 
 const CreateUserFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
+  login: yup.string().required('Login obrigatório'),
   email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
   password: yup
     .string()
@@ -38,23 +45,39 @@ const CreateUserFormSchema = yup.object().shape({
   password_confirmation: yup
     .string()
     .oneOf([null, yup.ref('password')], 'As senhas precisam ser iguais'),
+  role: yup.number().required('Permissão obrigatória'),
 });
 
 export default function CreateUser() {
   const router = useRouter();
+  const toast = useToast();
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
-      const response = await api.post('users', {
-        user: {
-          ...user,
-          created_at: new Date(),
-        },
-      });
+      const response = await api.post('user/create', { ...user });
       return response.data.user;
     },
     {
       onSuccess: () => {
+        toast({
+          title: 'Sucesso.',
+          description: 'Usuário criado.',
+          status: 'success',
+          position: 'top-right',
+          isClosable: true,
+        });
+
         queryClient.invalidateQueries('users');
+      },
+      onError: (error: AxiosError) => {
+        console.log(error.request, error.response, error.config.data);
+        toast({
+          title: `Erro ${error.request.status}.`,
+          description: error.message,
+          status: 'error',
+          duration: 9000,
+          position: 'top-right',
+          isClosable: true,
+        });
       },
     }
   );
@@ -109,6 +132,24 @@ export default function CreateUser() {
                 error={errors.email}
                 {...register('email')}
               />
+            </SimpleGrid>
+
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Input
+                name="login"
+                label="Login"
+                error={errors.login}
+                {...register('login')}
+              />
+              <Select
+                name="role"
+                label="Permissão"
+                error={errors.role}
+                {...register('role')}
+              >
+                <option value={role.Adm}>Administrator</option>
+                <option value={role.User}>User</option>
+              </Select>
             </SimpleGrid>
 
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">

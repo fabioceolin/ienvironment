@@ -29,8 +29,6 @@ import { role } from 'enums/role';
 export default function UserList() {
   const { data, isLoading, isFetching, error } = useUsers();
 
-  console.log(data);
-
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,

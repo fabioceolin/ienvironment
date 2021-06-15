@@ -22,8 +22,8 @@ export function setupAPIClient(ctx = undefined) {
     },
     (error: AxiosError) => {
       console.log('erro api', error);
-      if (error.response.status === 401) {
-        if (error.response.data?.code === 'token.expired') {
+      if (error.response?.status === 401) {
+        if (error.response.headers['token-expired'] === 'true') {
           cookies = parseCookies(ctx);
 
           const { 'ienvironment.refreshToken': oldRefreshToken } = cookies;

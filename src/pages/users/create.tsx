@@ -7,7 +7,9 @@ import {
   SimpleGrid,
   HStack,
   Button,
+  useToast,
 } from '@chakra-ui/react';
+import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -29,6 +31,7 @@ type CreateUserFormData = {
   email: string;
   password: string;
   password_confirmation: string;
+  role: number;
 };
 
 const CreateUserFormSchema = yup.object().shape({
@@ -42,23 +45,39 @@ const CreateUserFormSchema = yup.object().shape({
   password_confirmation: yup
     .string()
     .oneOf([null, yup.ref('password')], 'As senhas precisam ser iguais'),
+  role: yup.number().required('Permissão obrigatória'),
 });
 
 export default function CreateUser() {
   const router = useRouter();
+  const toast = useToast();
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
-      const response = await api.post('user/create', {
-        user: {
-          ...user,
-          created_at: new Date(),
-        },
-      });
+      const response = await api.post('user/create', { ...user });
       return response.data.user;
     },
     {
       onSuccess: () => {
+        toast({
+          title: 'Sucesso.',
+          description: 'Usuário criado.',
+          status: 'success',
+          position: 'top-right',
+          isClosable: true,
+        });
+
         queryClient.invalidateQueries('users');
+      },
+      onError: (error: AxiosError) => {
+        console.log(error.request, error.response, error.config.data);
+        toast({
+          title: `Erro ${error.request.status}.`,
+          description: error.message,
+          status: 'error',
+          duration: 9000,
+          position: 'top-right',
+          isClosable: true,
+        });
       },
     }
   );
@@ -123,7 +142,7 @@ export default function CreateUser() {
                 {...register('login')}
               />
               <Select
-                name="select"
+                name="role"
                 label="Permissão"
                 error={errors.role}
                 {...register('role')}

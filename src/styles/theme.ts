@@ -21,9 +21,22 @@ export const theme = extendTheme({
   },
   styles: {
     global: {
+      '*': {
+        'scrollbar-color': '#353646 transparent',
+      },
       body: {
         bg: 'gray.900',
         color: 'gray.50',
+      },
+      '*::-webkit-scrollbar': {
+        width: '7px',
+      },
+      '*::-webkit-scrollbar-thumb': {
+        'background-color': '#4B4D63',
+        'border-radius': '20px',
+      },
+      '::-webkit-scrollbar-thumb:hover': {
+        background: '#353646',
       },
     },
   },

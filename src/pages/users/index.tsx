@@ -1,5 +1,8 @@
+import React from 'react';
 import NextLink from 'next/link';
 import {
+  useBreakpointValue,
+  useDisclosure,
   Spinner,
   Flex,
   Text,
@@ -7,27 +10,22 @@ import {
   Box,
   Heading,
   Button,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Td,
-  Th,
-  Checkbox,
-  useBreakpointValue,
-  Link,
+  SimpleGrid,
 } from '@chakra-ui/react';
-import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 
+import { api } from 'services/apiClient';
+
+import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useUsers } from 'hooks/useUsers';
 import { queryClient } from 'services/queryClient';
-import { api } from 'services/apiClient';
-import { role } from 'enums/role';
+import { UserCard } from 'components/UserCard';
+import { Dialog } from 'components/Dialog';
 
 export default function UserList() {
   const { data, isLoading, isFetching, error } = useUsers();
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
   const isWideVersion = useBreakpointValue({
     base: false,
@@ -55,7 +53,7 @@ export default function UserList() {
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
 
-        <Box flex="1" borderRadius={8} bg="gray.800" p="8">
+        <Box flex="1" borderRadius={8}>
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
               Usuários
@@ -74,7 +72,14 @@ export default function UserList() {
                 Criar novo
               </Button>
             </NextLink>
+            <Button onClick={onOpen}>Discard</Button>
           </Flex>
+          <Dialog
+            title="Deletar"
+            description="Deseja realmente apagar esse usuário?"
+            isOpen={isOpen}
+            onClose={onClose}
+          />
 
           {isLoading ? (
             <Flex justify="center">
@@ -85,65 +90,26 @@ export default function UserList() {
               <Text>Falha ao obter dados dos usuários</Text>
             </Flex>
           ) : (
-            <>
-              <Table>
-                <Thead>
-                  <Tr>
-                    <Th px={['4', '4', '6']} color="gray.300" width="8">
-                      <Checkbox colorScheme="pink" />
-                    </Th>
-                    <Th>Usuário</Th>
-                    {isWideVersion && <Th>Permissão</Th>}
-                    <Th width="8"></Th>
-                  </Tr>
-                </Thead>
-
-                <Tbody>
-                  {data.map((user) => {
-                    return (
-                      <Tr key={user.Id}>
-                        <Td px={['4', '4', '6']} color="gray.300" width="8">
-                          <Checkbox colorScheme="pink" />
-                        </Td>
-                        <Td>
-                          <Box>
-                            <Link
-                              color="purple.400"
-                              // onMouseEnter={() => handlePrefetchUser(user.id)}
-                            >
-                              <Text fontWeight="Bold">{user.Name}</Text>
-                            </Link>
-                            <Text fontSize="sm" color="gray.300">
-                              {user.Email}
-                            </Text>
-                          </Box>
-                        </Td>
-                        {isWideVersion && (
-                          <Td>
-                            <Text color="gray.300">
-                              {user.Role === role.Adm
-                                ? 'Administrator'
-                                : 'User'}
-                            </Text>
-                          </Td>
-                        )}
-                        <Td>
-                          <Button
-                            as="a"
-                            size="sm"
-                            fontSize="sm"
-                            colorScheme="purple"
-                            leftIcon={<Icon as={RiPencilLine} fontSize="16" />}
-                          >
-                            Editar
-                          </Button>
-                        </Td>
-                      </Tr>
-                    );
-                  })}
-                </Tbody>
-              </Table>
-            </>
+            <SimpleGrid
+              flex="1"
+              gap="4"
+              minChildWidth="320px"
+              templateRows="auto 1fr"
+              align="flex-start"
+            >
+              {data.map((user) => {
+                return (
+                  <UserCard
+                    Id={user.Id}
+                    Name={user.Name}
+                    Email={user.Email}
+                    Role={user.Role}
+                    key={user.Id}
+                    Enabled={user.Enabled}
+                  />
+                );
+              })}
+            </SimpleGrid>
           )}
         </Box>
       </Flex>

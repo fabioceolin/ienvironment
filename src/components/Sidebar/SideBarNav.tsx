@@ -1,4 +1,6 @@
+import { useContext } from 'react';
 import { Stack } from '@chakra-ui/react';
+import { AuthContext } from 'contexts/AuthContext';
 import {
   RiLogoutBoxLine,
   RiDashboardLine,
@@ -10,6 +12,7 @@ import { NavLink } from './NavLink';
 import { NavSection } from './NavSection';
 
 export function SideBarNav() {
+  const { signOut } = useContext(AuthContext);
   return (
     <Stack spacing="12" align="flex-start">
       <NavSection title="GERAL">
@@ -27,7 +30,12 @@ export function SideBarNav() {
         <NavLink icon={RiRemoteControl2Line} href="/controller">
           Controller
         </NavLink>
-        <NavLink icon={RiLogoutBoxLine} href="/logout">
+        <NavLink
+          icon={RiLogoutBoxLine}
+          onClick={signOut}
+          shouldMatchExactHref
+          href="/"
+        >
           Sair
         </NavLink>
       </NavSection>

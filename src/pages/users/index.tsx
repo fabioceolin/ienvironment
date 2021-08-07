@@ -69,7 +69,7 @@ export default function UserList() {
                 colorScheme="pink"
                 leftIcon={<Icon as={RiAddLine} fontSize="20" />}
               >
-                Criar novo
+                Adicionar
               </Button>
             </NextLink>
             <Button onClick={onOpen}>Discard</Button>

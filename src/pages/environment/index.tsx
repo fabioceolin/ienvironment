@@ -1,4 +1,5 @@
 import React from 'react';
+import Head from 'next/head';
 import NextLink from 'next/link';
 import {
   Flex,
@@ -22,6 +23,9 @@ export default function EnvironmentList() {
   const { data, isLoading, isFetching, error } = useEnvironment();
   return (
     <Box>
+      <Head>
+        <title>iE | Environment</title>
+      </Head>
       <Header />
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">

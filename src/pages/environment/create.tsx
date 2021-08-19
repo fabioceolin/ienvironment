@@ -1,3 +1,5 @@
+import React from 'react';
+import Head from 'next/head';
 import {
   Flex,
   Box,
@@ -82,6 +84,9 @@ export default function CreateEnvironment() {
 
   return (
     <Box>
+      <Head>
+        <title>iE | Create environment</title>
+      </Head>
       <Header />
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">

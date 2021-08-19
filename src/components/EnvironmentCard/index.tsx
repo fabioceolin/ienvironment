@@ -4,17 +4,21 @@ import {
   Heading,
   Text,
   Stack,
+  HStack,
   Image,
-  ImageProps,
   BoxProps,
+  IconButton,
+  Tooltip,
+  Icon,
 } from '@chakra-ui/react';
 import { motion, Variants } from 'framer-motion';
+
+import { FiEdit3, FiX, FiMenu } from 'react-icons/fi';
 
 const IMAGE =
   'https://www.lottehotel.com/content/dam/lotte-hotel/city/jeju/facilities/business/5350-151125-2000-fac-ltcj.jpg.thumb.768.768.jpg';
 
 const MotionBox = motion<BoxProps>(Box);
-const MotionImage = motion<ImageProps>(Image);
 
 interface EnvironmentCardProps {
   title: string;
@@ -24,16 +28,16 @@ interface EnvironmentCardProps {
 export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
   const slashMotion: Variants = {
     hover: {
-      y: -20,
+      y: -60,
       transition: {
-        duration: 0.4,
+        duration: 0.3,
         type: 'tween',
         ease: 'easeInOut',
       },
     },
   };
   return (
-    <Center py={12}>
+    <Center py={4}>
       <MotionBox
         whileHover="hover"
         initial="hidden"
@@ -54,33 +58,59 @@ export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
           pos={'relative'}
           height={'230px'}
           variants={slashMotion}
-          _after={{
-            transition: 'all .3s ease',
-            content: '""',
-            w: 'full',
-            h: 'full',
-            pos: 'absolute',
-            top: 0,
-            left: 0,
-            backgroundImage: `url(${IMAGE})`,
-            filter: 'blur(15px)',
-            zIndex: -1,
-          }}
-          _groupHover={{
-            _after: {
-              filter: 'blur(20px)',
-            },
-          }}
         >
-          <MotionImage
+          <Image
             rounded={'lg'}
             height={230}
             width={282}
             objectFit={'cover'}
-            variants={slashMotion}
             src={IMAGE}
+            fallbackSrc="https://via.placeholder.com/150"
           />
         </MotionBox>
+        <Center>
+          <HStack pos="absolute" top="160px" zIndex={-1}>
+            <Tooltip
+              hasArrow
+              label="Visualizar"
+              bg="gray.400"
+              placement="bottom"
+              color="black"
+            >
+              <IconButton
+                colorScheme="blackAlpha"
+                aria-label="Editar"
+                icon={<Icon as={FiMenu} />}
+              />
+            </Tooltip>
+            <Tooltip
+              hasArrow
+              label="Editar"
+              bg="gray.400"
+              placement="bottom"
+              color="black"
+            >
+              <IconButton
+                colorScheme="blackAlpha"
+                aria-label="Editar"
+                icon={<Icon as={FiEdit3} />}
+              />
+            </Tooltip>
+            <Tooltip
+              hasArrow
+              label="Remover"
+              bg="gray.400"
+              placement="bottom"
+              color="black"
+            >
+              <IconButton
+                colorScheme="blackAlpha"
+                aria-label="Editar"
+                icon={<Icon as={FiX} />}
+              />
+            </Tooltip>
+          </HStack>
+        </Center>
         <Stack pt={10} align={'center'}>
           <Heading fontSize={'2xl'} fontFamily={'body'} fontWeight={500}>
             {title}

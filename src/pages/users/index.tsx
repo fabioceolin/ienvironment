@@ -27,25 +27,6 @@ export default function UserList() {
   const { data, isLoading, isFetching, error } = useUsers();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const isWideVersion = useBreakpointValue({
-    base: false,
-    lg: true,
-  });
-
-  async function handlePrefetchUser(userId: string) {
-    await queryClient.prefetchQuery(
-      ['user', userId],
-      async () => {
-        const response = await api.get(`users/${userId}`);
-
-        return response.data;
-      },
-      {
-        staleTime: 1000 * 60 * 10, // 10 minutos
-      }
-    );
-  }
-
   return (
     <Box>
       <Header />
@@ -100,12 +81,12 @@ export default function UserList() {
               {data.map((user) => {
                 return (
                   <UserCard
-                    Id={user.Id}
-                    Name={user.Name}
-                    Email={user.Email}
-                    Role={user.Role}
-                    key={user.Id}
-                    Enabled={user.Enabled}
+                    Id={user.id}
+                    Name={user.name}
+                    Email={user.email}
+                    Role={user.role}
+                    Enabled={user.enabled}
+                    key={user.id}
                   />
                 );
               })}

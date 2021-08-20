@@ -63,7 +63,9 @@ const series = [{ name: 'series1', data: [31, 120, 10, 28, 61, 18, 109] }];
 export default function Dashboard() {
   return (
     <Flex direction="column" h="100vh">
-      <Head>Dashboard</Head>
+      <Head>
+        <title>iE | Dashboard</title>
+      </Head>
       <Header />
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">

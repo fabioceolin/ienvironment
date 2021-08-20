@@ -3,31 +3,31 @@ import { useQuery } from 'react-query';
 import { api } from 'services/apiClient';
 
 type Users = {
-  Id: string;
-  Name: string;
-  Email: string;
-  Role: role;
-  Enabled: boolean;
-  CreatedAt: string;
-  UpdatedAt: string;
+  id: string;
+  name: string;
+  email: string;
+  role: role;
+  enabled: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export async function getUsers(): Promise<Users[]> {
   const { data } = await api.get<Users[]>('user/getallusers');
-
+  console.log(data);
   const users = data.map((user) => {
     return {
-      Id: user.Id,
-      Name: user.Name,
-      Email: user.Email,
-      Role: user.Role,
-      Enabled: user.Enabled,
-      CreatedAt: new Date(user.CreatedAt).toLocaleDateString('pt-BR', {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      enabled: user.enabled,
+      createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
       }),
-      UpdatedAt: new Date(user.CreatedAt).toLocaleDateString('pt-BR', {
+      updatedAt: new Date(user.updatedAt).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',

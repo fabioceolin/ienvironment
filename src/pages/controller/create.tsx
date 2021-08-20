@@ -21,39 +21,54 @@ import { useMutation } from 'react-query';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
-import { TextArea } from 'components/Form/Textarea';
+import { Select } from 'components/Form/Select';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
+import { role } from 'enums/role';
 
-type CreateEnvironmentFormData = {
+type CreateUserFormData = {
   name: string;
-  description?: string;
+  login: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  role: number;
 };
 
 const CreateUserFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
+  login: yup.string().required('Login obrigatório'),
+  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
+  password: yup
+    .string()
+    .required('Senha obrigatória')
+    .min(6, 'No minimo 6 caracteres'),
+  password_confirmation: yup
+    .string()
+    .oneOf([null, yup.ref('password')], 'As senhas precisam ser iguais'),
+  role: yup.number().required('Permissão obrigatória'),
 });
 
-export default function CreateEnvironment() {
+export default function CreateUser() {
   const router = useRouter();
   const toast = useToast();
-  const createEnvironment = useMutation(
-    async (environment: CreateEnvironmentFormData) => {
-      const response = await api.post('Environment/create', { ...environment });
+  const createUser = useMutation(
+    async (user: CreateUserFormData) => {
+      const response = await api.post('user/create', { ...user });
       return response.data.user;
     },
     {
       onSuccess: () => {
         toast({
           title: 'Sucesso.',
-          description: 'Ambiente criado.',
+          description: 'Usuário criado.',
           status: 'success',
           position: 'top-right',
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('environments');
+        queryClient.invalidateQueries('users');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);
@@ -75,17 +90,18 @@ export default function CreateEnvironment() {
 
   const { errors } = formState;
 
-  const handleCreateEnvironment: SubmitHandler<CreateEnvironmentFormData> =
-    async (values) => {
-      await createEnvironment.mutateAsync(values);
+  const handleCreateUser: SubmitHandler<CreateUserFormData> = async (
+    values
+  ) => {
+    await createUser.mutateAsync(values);
 
-      router.push('/environment');
-    };
+    router.push('/users');
+  };
 
   return (
     <Box>
       <Head>
-        <title>iE | Create environment</title>
+        <title>iE | Create controller</title>
       </Head>
       <Header />
 
@@ -98,10 +114,10 @@ export default function CreateEnvironment() {
           borderRadius={8}
           bg="gray.800"
           p={['6', '8']}
-          onSubmit={handleSubmit(handleCreateEnvironment)}
+          onSubmit={handleSubmit(handleCreateUser)}
         >
           <Heading size="lg" fontWeight="normal">
-            Adicionar ambiente
+            Criar usuário
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -110,18 +126,51 @@ export default function CreateEnvironment() {
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Input
                 name="name"
-                label="Nome"
+                label="Nome completo"
                 error={errors.name}
                 {...register('name')}
+              />
+              <Input
+                name="email"
+                type="email"
+                label="E-mail"
+                error={errors.email}
+                {...register('email')}
               />
             </SimpleGrid>
 
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-              <TextArea
-                name="description"
-                label="Descrição"
-                error={errors.description}
-                {...register('description')}
+              <Input
+                name="login"
+                label="Login"
+                error={errors.login}
+                {...register('login')}
+              />
+              <Select
+                name="role"
+                label="Permissão"
+                error={errors.role}
+                {...register('role')}
+              >
+                <option value={role.Adm}>Administrator</option>
+                <option value={role.User}>User</option>
+              </Select>
+            </SimpleGrid>
+
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Input
+                name="password"
+                type="password"
+                label="Senha"
+                error={errors.password}
+                {...register('password')}
+              />
+              <Input
+                name="password_confirmation"
+                type="password"
+                error={errors.password_confirmation}
+                label="Confirmação da senha"
+                {...register('password_confirmation')}
               />
             </SimpleGrid>
           </VStack>

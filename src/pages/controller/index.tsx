@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import {
+  useBreakpointValue,
   useDisclosure,
   Spinner,
   Flex,
@@ -11,64 +12,35 @@ import {
   Heading,
   Button,
   SimpleGrid,
-  useToast,
 } from '@chakra-ui/react';
 
 import { api } from 'services/apiClient';
 
-import { RiAddLine } from 'react-icons/ri';
+import { RiAddLine, RiPencilLine } from 'react-icons/ri';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
-import { useUsers } from 'hooks/useUsers';
+import { useMCUControllers } from 'hooks/useMCUControllers';
 import { queryClient } from 'services/queryClient';
 import { UserCard } from 'components/UserCard';
 import { Dialog } from 'components/Dialog';
 
-export default function UserList() {
-  const [ClickedUserID, setClickedUserID] = useState<string>('');
-  const { data, isLoading, isFetching, error } = useUsers();
+export default function ControllerList() {
+  const { data, isLoading, isFetching, error } = useMCUControllers();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const toast = useToast();
+  async function handlePrefetchUser(userId: string) {
+    await queryClient.prefetchQuery(
+      ['user', userId],
+      async () => {
+        const response = await api.get(`users/${userId}`);
 
-  const handleOpenDialog = (userID: string) => {
-    onOpen();
-    setClickedUserID(userID);
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    if (!userId) {
-      toast({
-        title: 'Internal error.',
-        description: 'Falha ao obter o ID do usuário.',
-        status: 'error',
-        position: 'top-right',
-        isClosable: true,
-      });
-    }
-
-    const response = await api.delete(`user/delete/${userId}`);
-
-    response.status == 200
-      ? toast({
-          title: 'Sucesso!',
-          description: response.data,
-          status: 'error',
-          position: 'top-right',
-          isClosable: true,
-        })
-      : toast({
-          title: 'Internal error.',
-          description: 'Falha ao deletar o usuário.',
-          status: 'error',
-          position: 'top-right',
-          isClosable: true,
-        });
-
-    setClickedUserID('');
-    queryClient.invalidateQueries('users');
-    onClose();
-  };
+        return response.data;
+      },
+      {
+        staleTime: 1000 * 60 * 10, // 10 minutos
+      }
+    );
+  }
 
   return (
     <Box>
@@ -88,7 +60,7 @@ export default function UserList() {
                 <Spinner size="sm" color="gray.500" ml="4" />
               )}
             </Heading>
-            <NextLink href="/users/create" passHref>
+            <NextLink href="/controller/create" passHref>
               <Button
                 as="a"
                 size="sm"
@@ -105,7 +77,6 @@ export default function UserList() {
             description="Deseja realmente apagar esse usuário?"
             isOpen={isOpen}
             onClose={onClose}
-            onYesClick={() => handleDeleteUser(ClickedUserID)}
           />
 
           {isLoading ? (
@@ -129,11 +100,10 @@ export default function UserList() {
                   <UserCard
                     Id={user.id}
                     Name={user.name}
-                    Email={user.email}
-                    Role={user.role}
-                    Enabled={user.enabled}
+                    Email={user.description}
+                    Role={1}
                     key={user.id}
-                    onRightButtonClick={() => handleOpenDialog(user.id)}
+                    Enabled={user.enabled}
                   />
                 );
               })}

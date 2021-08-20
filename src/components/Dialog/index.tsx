@@ -15,9 +15,16 @@ type DialogProps = {
   description: string;
   isOpen: boolean;
   onClose: () => void;
+  onYesClick?: () => Promise<void>;
 };
 
-export function Dialog({ title, description, onClose, isOpen }: DialogProps) {
+export function Dialog({
+  title,
+  description,
+  onClose,
+  onYesClick,
+  isOpen,
+}: DialogProps) {
   const cancelRef = useRef();
   return (
     <AlertDialog
@@ -37,7 +44,7 @@ export function Dialog({ title, description, onClose, isOpen }: DialogProps) {
           <Button colorScheme="pink" ref={cancelRef} onClick={onClose}>
             No
           </Button>
-          <Button colorScheme="red" ml={3}>
+          <Button colorScheme="red" ml={3} onClick={onYesClick}>
             Yes
           </Button>
         </AlertDialogFooter>

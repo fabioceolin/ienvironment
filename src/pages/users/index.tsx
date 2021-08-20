@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Head from 'next/head';
 import NextLink from 'next/link';
 import {
-  useBreakpointValue,
   useDisclosure,
   Spinner,
   Flex,
@@ -11,11 +11,12 @@ import {
   Heading,
   Button,
   SimpleGrid,
+  useToast,
 } from '@chakra-ui/react';
 
 import { api } from 'services/apiClient';
 
-import { RiAddLine, RiPencilLine } from 'react-icons/ri';
+import { RiAddLine } from 'react-icons/ri';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useUsers } from 'hooks/useUsers';
@@ -24,11 +25,56 @@ import { UserCard } from 'components/UserCard';
 import { Dialog } from 'components/Dialog';
 
 export default function UserList() {
+  const [ClickedUserID, setClickedUserID] = useState<string>('');
   const { data, isLoading, isFetching, error } = useUsers();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
+  const toast = useToast();
+
+  const handleOpenDialog = (userID: string) => {
+    onOpen();
+    setClickedUserID(userID);
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!userId) {
+      toast({
+        title: 'Internal error.',
+        description: 'Falha ao obter o ID do usuário.',
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+      });
+    }
+
+    const response = await api.delete(`user/delete/${userId}`);
+
+    response.status == 200
+      ? toast({
+          title: 'Sucesso!',
+          description: response.data,
+          status: 'error',
+          position: 'top-right',
+          isClosable: true,
+        })
+      : toast({
+          title: 'Internal error.',
+          description: 'Falha ao deletar o usuário.',
+          status: 'error',
+          position: 'top-right',
+          isClosable: true,
+        });
+
+    setClickedUserID('');
+    queryClient.invalidateQueries('users');
+    onClose();
+  };
+
   return (
     <Box>
+      <Head>
+        <title>iE | Users</title>
+      </Head>
       <Header />
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
@@ -53,13 +99,13 @@ export default function UserList() {
                 Adicionar
               </Button>
             </NextLink>
-            <Button onClick={onOpen}>Discard</Button>
           </Flex>
           <Dialog
             title="Deletar"
             description="Deseja realmente apagar esse usuário?"
             isOpen={isOpen}
             onClose={onClose}
+            onYesClick={() => handleDeleteUser(ClickedUserID)}
           />
 
           {isLoading ? (
@@ -87,6 +133,7 @@ export default function UserList() {
                     Role={user.role}
                     Enabled={user.enabled}
                     key={user.id}
+                    onRightButtonClick={() => handleOpenDialog(user.id)}
                   />
                 );
               })}

@@ -7,9 +7,17 @@ interface UserCardProps {
   Enabled: boolean;
   Role: number;
   avatarUrl?: string;
+  onLeftButtonClick?: () => void;
+  onRightButtonClick?: () => void;
 }
 
-export function UserCard({ Name, Email, avatarUrl = '' }: UserCardProps) {
+export function UserCard({
+  Name,
+  Email,
+  avatarUrl = '',
+  onRightButtonClick,
+  onLeftButtonClick,
+}: UserCardProps) {
   return (
     <Box
       p={['6', '8']}
@@ -55,6 +63,7 @@ export function UserCard({ Name, Email, avatarUrl = '' }: UserCardProps) {
           _focus={{
             bg: 'pink.600',
           }}
+          onClick={onLeftButtonClick}
         >
           Editar
         </Button>
@@ -70,6 +79,7 @@ export function UserCard({ Name, Email, avatarUrl = '' }: UserCardProps) {
           _focus={{
             bg: 'red.500',
           }}
+          onClick={onRightButtonClick}
         >
           Deletar
         </Button>

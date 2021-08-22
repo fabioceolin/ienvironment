@@ -10,6 +10,7 @@ import {
   IconButton,
   Tooltip,
   Icon,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { motion, Variants } from 'framer-motion';
 
@@ -26,6 +27,10 @@ interface EnvironmentCardProps {
 }
 
 export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
+  const isWideVersion = useBreakpointValue({
+    base: false,
+    lg: true,
+  });
   const slashMotion: Variants = {
     hover: {
       y: -60,
@@ -62,14 +67,19 @@ export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
           <Image
             rounded={'lg'}
             height={230}
-            width={282}
+            width={'100%'}
             objectFit={'cover'}
             src={IMAGE}
             fallbackSrc="https://via.placeholder.com/150"
           />
         </MotionBox>
         <Center>
-          <HStack pos="absolute" top="160px" zIndex={-1}>
+          <HStack
+            pos={isWideVersion ? 'absolute' : 'static'}
+            top="160px"
+            zIndex={isWideVersion ? -1 : 0}
+            pt={isWideVersion ? '' : 3}
+          >
             <Tooltip
               hasArrow
               label="Visualizar"
@@ -111,8 +121,15 @@ export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
             </Tooltip>
           </HStack>
         </Center>
-        <Stack pt={10} align={'center'}>
-          <Heading fontSize={'2xl'} fontFamily={'body'} fontWeight={500}>
+        <Stack pt={isWideVersion ? 10 : 3} align={'center'}>
+          <Heading
+            fontSize={'2xl'}
+            fontFamily={'body'}
+            fontWeight={500}
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+          >
             {title}
           </Heading>
           <Text color={'gray.500'} fontSize={'sm'} textTransform={'uppercase'}>

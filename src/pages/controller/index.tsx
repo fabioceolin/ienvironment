@@ -91,7 +91,7 @@ export default function ControllerList() {
             <SimpleGrid
               flex="1"
               gap="4"
-              minChildWidth="320px"
+              columns={[1, null, 3]}
               templateRows="auto 1fr"
               align="flex-start"
             >

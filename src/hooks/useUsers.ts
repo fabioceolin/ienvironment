@@ -1,19 +1,19 @@
-import { role } from 'enums/role';
+import { Role } from 'enums/Role';
 import { useQuery } from 'react-query';
 import { api } from 'services/apiClient';
 
-type Users = {
+export type UsersProps = {
   id: string;
   name: string;
   email: string;
-  role: role;
+  role: Role;
   enabled: boolean;
   createdAt: string;
   updatedAt: string;
 };
 
-export async function getUsers(): Promise<Users[]> {
-  const { data } = await api.get<Users[]>('user/getallusers');
+export async function getUsers(): Promise<UsersProps[]> {
+  const { data } = await api.get<UsersProps[]>('user/getallusers');
   const users = data.map((user) => {
     return {
       id: user.id,

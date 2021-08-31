@@ -24,9 +24,18 @@ const MotionBox = motion<BoxProps>(Box);
 interface EnvironmentCardProps {
   title: string;
   description: string;
+  onViewButtonClick?: () => void;
+  onEditButtonClick?: () => void;
+  onDeleteButtonClick?: () => void;
 }
 
-export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
+export function EnvironmentCard({
+  title,
+  description,
+  onViewButtonClick,
+  onEditButtonClick,
+  onDeleteButtonClick,
+}: EnvironmentCardProps) {
   const isWideVersion = useBreakpointValue({
     base: false,
     lg: true,
@@ -89,8 +98,9 @@ export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
             >
               <IconButton
                 colorScheme="blackAlpha"
-                aria-label="Editar"
+                aria-label="Visualizar"
                 icon={<Icon as={FiMenu} />}
+                onClick={onViewButtonClick}
               />
             </Tooltip>
             <Tooltip
@@ -104,6 +114,7 @@ export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
                 colorScheme="blackAlpha"
                 aria-label="Editar"
                 icon={<Icon as={FiEdit3} />}
+                onClick={onEditButtonClick}
               />
             </Tooltip>
             <Tooltip
@@ -115,8 +126,9 @@ export function EnvironmentCard({ title, description }: EnvironmentCardProps) {
             >
               <IconButton
                 colorScheme="blackAlpha"
-                aria-label="Editar"
+                aria-label="Remover"
                 icon={<Icon as={FiX} />}
+                onClick={onDeleteButtonClick}
               />
             </Tooltip>
           </HStack>

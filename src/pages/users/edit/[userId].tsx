@@ -10,6 +10,7 @@ import {
   HStack,
   Button,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -25,44 +26,37 @@ import { Select } from 'components/Form/Select';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
-import { role } from 'enums/role';
+import { UsersProps } from 'hooks/useUsers';
+import { Role } from 'enums/Role';
+import { Form } from 'components/Skeleton/Form';
 
 type CreateUserFormData = {
   name: string;
   login: string;
   email: string;
-  password: string;
-  password_confirmation: string;
   role: number;
 };
 
-type User = {
-  id: string;
-  name: string;
+type User = UsersProps & {
   login: string;
-  email: string;
-  role: number;
 };
 
 const CreateUserFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
-  login: yup.string().required('Login obrigatório'),
   email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
-  password: yup
-    .string()
-    .required('Senha obrigatória')
-    .min(6, 'No minimo 6 caracteres'),
-  password_confirmation: yup
-    .string()
-    .oneOf([null, yup.ref('password')], 'As senhas precisam ser iguais'),
   role: yup.number().required('Permissão obrigatória'),
 });
 
 export default function EditUser() {
+  const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User>({} as User);
   const router = useRouter();
   const toast = useToast();
   const { userId } = router.query;
+
+  const { register, handleSubmit, formState, setValue } = useForm({
+    resolver: yupResolver(CreateUserFormSchema),
+  });
 
   useEffect(() => {
     if (userId) {
@@ -70,6 +64,7 @@ export default function EditUser() {
         .get(`user?UserID=${userId}`)
         .then((response) => {
           setUser(response.data);
+          setIsLoading(false);
         })
         .catch((error: AxiosError) => {
           toast({
@@ -83,6 +78,12 @@ export default function EditUser() {
         });
     }
   }, []);
+
+  //set hook forms value
+  useEffect(() => {
+    setValue('name', user.name);
+    setValue('email', user.email);
+  }, [user]);
 
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
@@ -115,10 +116,6 @@ export default function EditUser() {
     }
   );
 
-  const { register, handleSubmit, formState } = useForm({
-    resolver: yupResolver(CreateUserFormSchema),
-  });
-
   const { errors } = formState;
 
   const handleCreateUser: SubmitHandler<CreateUserFormData> = async (
@@ -139,92 +136,85 @@ export default function EditUser() {
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
 
-        <Box
-          as="form"
-          flex="1"
-          borderRadius={8}
-          bg="gray.800"
-          p={['6', '8']}
-          onSubmit={handleSubmit(handleCreateUser)}
-        >
-          <Heading size="lg" fontWeight="normal">
-            Editar usuário
-          </Heading>
+        {isLoading ? (
+          <Form backgroundColor="gray.800" />
+        ) : (
+          <Box
+            as="form"
+            flex="1"
+            borderRadius={8}
+            bg="gray.800"
+            p={['6', '8']}
+            onSubmit={handleSubmit(handleCreateUser)}
+          >
+            <Heading size="lg" fontWeight="normal">
+              Editar usuário
+            </Heading>
 
-          <Divider my="6" borderColor="gray.700" />
+            <Divider my="6" borderColor="gray.700" />
+            <VStack spacing="8">
+              <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+                <Input
+                  name="name"
+                  label="Nome completo"
+                  defaultValue={user.name}
+                  error={errors.name}
+                  {...register('name')}
+                />
+                <Input
+                  name="email"
+                  type="email"
+                  label="E-mail"
+                  defaultValue={user.email}
+                  error={errors.email}
+                  {...register('email')}
+                />
+              </SimpleGrid>
 
-          <VStack spacing="8">
-            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-              <Input
-                name="name"
-                label="Nome completo"
-                defaultValue={user.name}
-                error={errors.name}
-                {...register('name')}
-              />
-              <Input
-                name="email"
-                type="email"
-                label="E-mail"
-                defaultValue={user.email}
-                error={errors.email}
-                {...register('email')}
-              />
-            </SimpleGrid>
-
-            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-              <Input
-                name="login"
-                label="Login"
-                defaultValue={user.login}
-                error={errors.login}
-                {...register('login')}
-              />
-              <Select
-                name="role"
-                label="Permissão"
-                defaultValue={user.role}
-                error={errors.role}
-                {...register('role')}
-              >
-                <option value={role.Adm}>Administrator</option>
-                <option value={role.User}>User</option>
-              </Select>
-            </SimpleGrid>
-
-            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-              <Input
-                name="password"
-                type="password"
-                label="Senha"
-                error={errors.password}
-                {...register('password')}
-              />
-              <Input
-                name="password_confirmation"
-                type="password"
-                error={errors.password_confirmation}
-                label="Confirmação da senha"
-                {...register('password_confirmation')}
-              />
-            </SimpleGrid>
-          </VStack>
-
-          <Flex mt="8" justify="flex-end">
-            <HStack spacing="4">
-              <Link href="/users" passHref>
-                <Button colorScheme="whiteAlpha">Cancelar</Button>
-              </Link>
-              <Button
-                colorScheme="pink"
-                type="submit"
-                isLoading={formState.isSubmitting}
-              >
-                Salvar
-              </Button>
-            </HStack>
-          </Flex>
-        </Box>
+              <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+                <Input
+                  name="login"
+                  label="Login"
+                  defaultValue={user.login}
+                  error={errors.login}
+                  isDisabled
+                  {...register('login')}
+                />
+                <Select
+                  name="role"
+                  label="Permissão"
+                  defaultValue={user.role}
+                  error={errors.role}
+                  {...register('role')}
+                >
+                  <option
+                    value={Role.Administrator}
+                    selected={user.role == Role.Administrator}
+                  >
+                    Administrator
+                  </option>
+                  <option value={Role.User} selected={user.role == Role.User}>
+                    User
+                  </option>
+                </Select>
+              </SimpleGrid>
+            </VStack>
+            <Flex mt="8" justify="flex-end">
+              <HStack spacing="4">
+                <Link href="/users" passHref>
+                  <Button colorScheme="whiteAlpha">Cancelar</Button>
+                </Link>
+                <Button
+                  colorScheme="pink"
+                  type="submit"
+                  isLoading={formState.isSubmitting}
+                >
+                  Salvar
+                </Button>
+              </HStack>
+            </Flex>
+          </Box>
+        )}
       </Flex>
     </Box>
   );

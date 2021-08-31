@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
+import router from 'next/router';
 import NextLink from 'next/link';
 import {
   useDisclosure,
@@ -17,14 +18,13 @@ import {
 import { api } from 'services/apiClient';
 
 import { RiAddLine } from 'react-icons/ri';
+import { Role } from 'enums/Role';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
-import { useUsers } from 'hooks/useUsers';
+import { useUsers, UsersProps } from 'hooks/useUsers';
 import { queryClient } from 'services/queryClient';
 import { UserCard } from 'components/UserCard';
 import { Dialog } from 'components/Dialog';
-import { route } from 'next/dist/next-server/server/router';
-import router from 'next/router';
 
 export default function UserList() {
   const [ClickedUserID, setClickedUserID] = useState<string>('');
@@ -58,7 +58,7 @@ export default function UserList() {
       ? toast({
           title: 'Sucesso!',
           description: response.data,
-          status: 'error',
+          status: 'success',
           position: 'top-right',
           isClosable: true,
         })
@@ -129,13 +129,13 @@ export default function UserList() {
               templateRows="auto 1fr"
               align="flex-start"
             >
-              {data.map((user) => {
+              {data.map((user: UsersProps) => {
                 return (
                   <UserCard
                     Id={user.id}
                     Name={user.name}
                     Email={user.email}
-                    Role={user.role}
+                    Role={Role[user.role]}
                     Enabled={user.enabled}
                     key={user.id}
                     onRightButtonClick={() => handleOpenDialog(user.id)}

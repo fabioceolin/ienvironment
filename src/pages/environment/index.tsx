@@ -54,7 +54,7 @@ export default function EnvironmentList() {
           <SimpleGrid
             flex="1"
             gap="4"
-            templateColumns="1fr 1fr 1fr"
+            columns={[1, null, 3]}
             templateRows="auto 1fr"
             align="flex-start"
           >

@@ -23,6 +23,8 @@ import { useUsers } from 'hooks/useUsers';
 import { queryClient } from 'services/queryClient';
 import { UserCard } from 'components/UserCard';
 import { Dialog } from 'components/Dialog';
+import { route } from 'next/dist/next-server/server/router';
+import router from 'next/router';
 
 export default function UserList() {
   const [ClickedUserID, setClickedUserID] = useState<string>('');
@@ -36,6 +38,9 @@ export default function UserList() {
     setClickedUserID(userID);
   };
 
+  const handleEditClick = (userId: string) => {
+    router.push(`users/edit/${userId}`);
+  };
   const handleDeleteUser = async (userId: string) => {
     if (!userId) {
       toast({
@@ -120,7 +125,7 @@ export default function UserList() {
             <SimpleGrid
               flex="1"
               gap="4"
-              minChildWidth="320px"
+              columns={[1, null, 3]}
               templateRows="auto 1fr"
               align="flex-start"
             >
@@ -134,6 +139,7 @@ export default function UserList() {
                     Enabled={user.enabled}
                     key={user.id}
                     onRightButtonClick={() => handleOpenDialog(user.id)}
+                    onLeftButtonClick={() => handleEditClick(user.id)}
                   />
                 );
               })}

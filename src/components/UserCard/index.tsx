@@ -39,12 +39,20 @@ export function UserCard({
         fontSize="2xl"
         fontFamily="body"
         flexWrap="nowrap"
+        textOverflow="ellipsis"
         whiteSpace="nowrap"
         overflow="hidden"
       >
         {Name}
       </Heading>
-      <Text fontWeight={600} color="gray.500" mb={4}>
+      <Text
+        fontWeight={600}
+        color="gray.500"
+        mb={4}
+        whiteSpace="nowrap"
+        overflow="hidden"
+        textOverflow="ellipsis"
+      >
         {Email}
       </Text>
       <Text textAlign="center" px={3}>

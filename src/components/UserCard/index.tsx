@@ -15,6 +15,7 @@ export function UserCard({
   Name,
   Email,
   Role,
+  Enabled,
   avatarUrl = '',
   onRightButtonClick,
   onLeftButtonClick,
@@ -27,6 +28,7 @@ export function UserCard({
       borderRadius={8}
       pb="4"
       textAlign="center"
+      filter={!Enabled && 'brightness(0.5)'}
     >
       <Avatar
         size="xl"

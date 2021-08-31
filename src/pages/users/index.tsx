@@ -23,6 +23,7 @@ import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useUsers, UsersProps } from 'hooks/useUsers';
 import { queryClient } from 'services/queryClient';
+import { UserCardSkeleton } from 'components/Skeleton/UserCardSkeleton';
 import { UserCard } from 'components/UserCard';
 import { Dialog } from 'components/Dialog';
 
@@ -114,9 +115,17 @@ export default function UserList() {
           />
 
           {isLoading ? (
-            <Flex justify="center">
-              <Spinner />
-            </Flex>
+            <SimpleGrid
+              flex="1"
+              gap="4"
+              columns={[1, null, 3]}
+              templateRows="auto 1fr"
+              align="flex-start"
+            >
+              <UserCardSkeleton />
+              <UserCardSkeleton />
+              <UserCardSkeleton />
+            </SimpleGrid>
           ) : error ? (
             <Flex justify="center">
               <Text>Falha ao obter dados dos usuários</Text>

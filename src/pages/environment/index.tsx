@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
+import router from 'next/router';
 import NextLink from 'next/link';
 import {
   Flex,
@@ -10,23 +11,88 @@ import {
   Button,
   Icon,
   Spinner,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 
+import { api } from 'services/apiClient';
+
+import { Dialog } from 'components/Dialog';
+import { EnvironmentCard } from 'components/EnvironmentCard';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
-import { EnvironmentCard } from 'components/EnvironmentCard';
 import { useEnvironment } from 'hooks/useEnvironments';
 
 import { RiAddLine } from 'react-icons/ri';
+import { queryClient } from 'services/queryClient';
 
 export default function EnvironmentList() {
+  const [ClickedEnvironmentID, setClickedEnvironmentID] = useState<string>('');
+  const { isOpen, onClose, onOpen } = useDisclosure();
   const { data, isLoading, isFetching, error } = useEnvironment();
+  const toast = useToast();
+
+  const handleOpenDialog = (environmentID: string) => {
+    onOpen();
+    setClickedEnvironmentID(environmentID);
+  };
+
+  const handleEditClick = (environmentID: string) => {
+    router.push(`environment/edit/${environmentID}`);
+  };
+
+  const handleViewClick = (environmentID: string) => {
+    router.push(`environment/edit/${environmentID}`);
+  };
+
+  const handleDeleteUser = async (environmentID: string) => {
+    if (!environmentID) {
+      toast({
+        title: 'Internal error.',
+        description: 'Falha ao obter o ID do ambiente.',
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+      });
+    }
+
+    const response = await api.delete(`environment/delete/${environmentID}`);
+
+    response.status == 200
+      ? toast({
+          title: 'Sucesso!',
+          description: response.data,
+          status: 'success',
+          position: 'top-right',
+          isClosable: true,
+        })
+      : toast({
+          title: 'Internal error.',
+          description: 'Falha ao deletar o ambiente.',
+          status: 'error',
+          position: 'top-right',
+          isClosable: true,
+        });
+
+    setClickedEnvironmentID('');
+    queryClient.invalidateQueries('environments');
+    onClose();
+  };
+
   return (
     <Box>
       <Head>
         <title>iE | Environment</title>
       </Head>
       <Header />
+
+      <Dialog
+        title="Deletar"
+        description="Deseja realmente apagar esse usuário?"
+        isOpen={isOpen}
+        onClose={onClose}
+        onYesClick={() => handleDeleteUser(ClickedEnvironmentID)}
+      />
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
@@ -73,6 +139,9 @@ export default function EnvironmentList() {
                     key={environment.id}
                     title={environment.name}
                     description={environment.description}
+                    onDeleteButtonClick={() => handleOpenDialog(environment.id)}
+                    onEditButtonClick={() => handleEditClick(environment.id)}
+                    onViewButtonClick={() => handleViewClick(environment.id)}
                   />
                 );
               })

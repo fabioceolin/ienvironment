@@ -20,40 +20,39 @@ import { api } from 'services/apiClient';
 import { RiAddLine } from 'react-icons/ri';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
-import { useMCUControllers } from 'hooks/useMCUControllers';
 import { queryClient } from 'services/queryClient';
-import { UserCard } from 'components/UserCard';
-import { Dialog } from 'components/Dialog';
 import { UserCardSkeleton } from 'components/Skeleton/UserCardSkeleton';
-import { Role } from 'enums/Role';
+import { Dialog } from 'components/Dialog';
+import { ImageCard } from 'components/ImageCard';
+import { ImageProps, useImages } from 'hooks/useImage';
 
-export default function ControllerList() {
-  const [ClickedControllerID, setClickedControllerID] = useState<string>('');
-  const { data, isLoading, isFetching, error } = useMCUControllers();
+export default function ImageList() {
+  const [ClickedUserID, setClickedUserID] = useState<string>('');
+  const { data, isLoading, isFetching, error } = useImages();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
   const toast = useToast();
 
-  const handleOpenDialog = (controllerId: string) => {
+  const handleOpenDialog = (userID: string) => {
     onOpen();
-    setClickedControllerID(controllerId);
+    setClickedUserID(userID);
   };
 
-  const handleEditClick = (controllerId: string) => {
-    router.push(`controller/edit/${controllerId}`);
+  const handleEditClick = (userId: string) => {
+    router.push(`users/edit/${userId}`);
   };
-  const handleDeleteUser = async (controllerId: string) => {
-    if (!controllerId) {
+  const handleDeleteUser = async (userId: string) => {
+    if (!userId) {
       toast({
         title: 'Internal error.',
-        description: 'Falha ao obter o ID do controlador.',
+        description: 'Falha ao obter o ID do usuário.',
         status: 'error',
         position: 'top-right',
         isClosable: true,
       });
     }
 
-    const response = await api.delete(`/MCUControllers/delete/${controllerId}`);
+    const response = await api.delete(`user/delete/${userId}`);
 
     response.status == 200
       ? toast({
@@ -65,31 +64,23 @@ export default function ControllerList() {
         })
       : toast({
           title: 'Internal error.',
-          description: 'Falha ao deletar o controlador.',
+          description: 'Falha ao deletar o usuário.',
           status: 'error',
           position: 'top-right',
           isClosable: true,
         });
 
-    setClickedControllerID('');
-    queryClient.invalidateQueries('MCUControllers');
+    setClickedUserID('');
+    queryClient.invalidateQueries('users');
     onClose();
   };
 
   return (
     <Box>
       <Head>
-        <title>iE | Users</title>
+        <title>iE | Image</title>
       </Head>
       <Header />
-
-      <Dialog
-        title="Deletar"
-        description="Deseja realmente apagar esse usuário?"
-        isOpen={isOpen}
-        onClose={onClose}
-        onYesClick={() => handleDeleteUser(ClickedControllerID)}
-      />
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
@@ -97,12 +88,12 @@ export default function ControllerList() {
         <Box flex="1" borderRadius={8}>
           <Flex mb="8" justify="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
-              Controlador
+              Images
               {!isLoading && isFetching && (
                 <Spinner size="sm" color="gray.500" ml="4" />
               )}
             </Heading>
-            <NextLink href="/controller/create" passHref>
+            <NextLink href="/image/create" passHref>
               <Button
                 as="a"
                 size="sm"
@@ -114,6 +105,13 @@ export default function ControllerList() {
               </Button>
             </NextLink>
           </Flex>
+          <Dialog
+            title="Deletar"
+            description="Deseja realmente apagar esse usuário?"
+            isOpen={isOpen}
+            onClose={onClose}
+            onYesClick={() => handleDeleteUser(ClickedUserID)}
+          />
 
           {isLoading ? (
             <SimpleGrid
@@ -129,29 +127,18 @@ export default function ControllerList() {
             </SimpleGrid>
           ) : error ? (
             <Flex justify="center">
-              <Text>Falha ao obter dados dos controladores</Text>
+              <Text>Falha as imagens</Text>
             </Flex>
           ) : (
             <SimpleGrid
               flex="1"
               gap="4"
-              columns={[1, null, 3]}
+              columns={[1, null, 3, 4]}
               templateRows="auto 1fr"
               align="flex-start"
             >
-              {data.map((controller) => {
-                return (
-                  <UserCard
-                    Id={controller.id}
-                    Name={controller.name}
-                    Email={controller.description}
-                    Role={`Login: ${controller.login}`}
-                    key={controller.id}
-                    Enabled={controller.enabled}
-                    onRightButtonClick={() => handleOpenDialog(controller.id)}
-                    onLeftButtonClick={() => handleEditClick(controller.id)}
-                  />
-                );
+              {data.map((image: ImageProps) => {
+                return <ImageCard name={image.altName} url={image.url} />;
               })}
             </SimpleGrid>
           )}

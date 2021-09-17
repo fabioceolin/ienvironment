@@ -53,6 +53,7 @@ export function EnvironmentCard({
   return (
     <Center py={4}>
       <MotionBox
+        h="100%"
         whileHover="hover"
         initial="hidden"
         animate="visible"

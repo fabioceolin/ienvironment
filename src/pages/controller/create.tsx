@@ -28,11 +28,15 @@ import { useRouter } from 'next/router';
 
 type CreateControllerFormData = {
   name: string;
+  login: string;
+  password: string;
   description?: string;
 };
 
-const CreateUserFormSchema = yup.object().shape({
+const CreateControllerFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
+  login: yup.string().required('Login obrigatório'),
+  password: yup.string().required('Senha obrigatória'),
 });
 
 export default function CreateController() {
@@ -40,7 +44,9 @@ export default function CreateController() {
   const toast = useToast();
   const createController = useMutation(
     async (controller: CreateControllerFormData) => {
-      const response = await api.post('Controller/create', { ...controller });
+      const response = await api.post('MCUControllers/create', {
+        ...controller,
+      });
       return response.data.user;
     },
     {
@@ -53,7 +59,7 @@ export default function CreateController() {
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('environments');
+        queryClient.invalidateQueries('MCUControllers');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);
@@ -70,7 +76,7 @@ export default function CreateController() {
   );
 
   const { register, handleSubmit, formState } = useForm({
-    resolver: yupResolver(CreateUserFormSchema),
+    resolver: yupResolver(CreateControllerFormSchema),
   });
 
   const { errors } = formState;
@@ -117,6 +123,22 @@ export default function CreateController() {
             </SimpleGrid>
 
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Input
+                name="login"
+                label="Login"
+                error={errors.login}
+                {...register('login')}
+              />
+              <Input
+                name="password"
+                type="password"
+                label="Senha"
+                error={errors.password}
+                {...register('password')}
+              />
+            </SimpleGrid>
+
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <TextArea
                 name="description"
                 label="Descrição"
@@ -128,7 +150,7 @@ export default function CreateController() {
 
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/controller" passHref>
                 <Button colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button

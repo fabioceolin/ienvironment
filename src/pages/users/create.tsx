@@ -25,7 +25,7 @@ import { Select } from 'components/Form/Select';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
-import { role } from 'enums/role';
+import { Role } from 'enums/Role';
 
 type CreateUserFormData = {
   name: string;
@@ -152,8 +152,8 @@ export default function CreateUser() {
                 error={errors.role}
                 {...register('role')}
               >
-                <option value={role.Adm}>Administrator</option>
-                <option value={role.User}>User</option>
+                <option value={Role.Administrator}>Administrator</option>
+                <option value={Role.User}>User</option>
               </Select>
             </SimpleGrid>
 

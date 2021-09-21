@@ -22,7 +22,7 @@ export const theme = extendTheme({
   styles: {
     global: {
       '*': {
-        'scrollbar-color': '#353646 transparent',
+        scrollbarColor: '#353646 transparent',
       },
       body: {
         bg: 'gray.900',
@@ -32,11 +32,32 @@ export const theme = extendTheme({
         width: '7px',
       },
       '*::-webkit-scrollbar-thumb': {
-        'background-color': '#4B4D63',
-        'border-radius': '20px',
+        backgroundColor: '#4B4D63',
+        borderRadius: '20px',
       },
       '::-webkit-scrollbar-thumb:hover': {
         background: '#353646',
+      },
+      '.react-modal-overlay': {
+        background: 'rgba(0, 0, 0, 0.5)',
+
+        position: 'fixed',
+        top: '0',
+        bottom: '0',
+        right: '0',
+        left: '0',
+
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      '.react-modal-content': {
+        width: '100%',
+        maxWidth: '576px',
+        background: '#1F2029',
+        padding: '3rem',
+        position: 'relative',
+        borderRadius: '0.25rem',
       },
     },
   },

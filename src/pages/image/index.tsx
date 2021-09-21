@@ -17,62 +17,23 @@ import {
 
 import { api } from 'services/apiClient';
 
-import { RiAddLine } from 'react-icons/ri';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { queryClient } from 'services/queryClient';
 import { UserCardSkeleton } from 'components/Skeleton/UserCardSkeleton';
-import { Dialog } from 'components/Dialog';
 import { ImageCard } from 'components/ImageCard';
 import { ImageProps, useImages } from 'hooks/useImage';
+import Upload from 'components/Upload';
+import { ImageModal } from 'components/ImageModal';
 
 export default function ImageList() {
-  const [ClickedUserID, setClickedUserID] = useState<string>('');
+  const [image, setImage] = useState<ImageProps>({} as ImageProps);
   const { data, isLoading, isFetching, error } = useImages();
   const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const toast = useToast();
-
-  const handleOpenDialog = (userID: string) => {
+  const handleClickImage = (imageId: string) => {
+    setImage(data.find((image) => image.id === imageId));
     onOpen();
-    setClickedUserID(userID);
-  };
-
-  const handleEditClick = (userId: string) => {
-    router.push(`users/edit/${userId}`);
-  };
-  const handleDeleteUser = async (userId: string) => {
-    if (!userId) {
-      toast({
-        title: 'Internal error.',
-        description: 'Falha ao obter o ID do usuário.',
-        status: 'error',
-        position: 'top-right',
-        isClosable: true,
-      });
-    }
-
-    const response = await api.delete(`user/delete/${userId}`);
-
-    response.status == 200
-      ? toast({
-          title: 'Sucesso!',
-          description: response.data,
-          status: 'success',
-          position: 'top-right',
-          isClosable: true,
-        })
-      : toast({
-          title: 'Internal error.',
-          description: 'Falha ao deletar o usuário.',
-          status: 'error',
-          position: 'top-right',
-          isClosable: true,
-        });
-
-    setClickedUserID('');
-    queryClient.invalidateQueries('users');
-    onClose();
   };
 
   return (
@@ -85,33 +46,21 @@ export default function ImageList() {
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
 
+        <ImageModal image={image} isOpen={isOpen} onClose={onClose} />
+
         <Box flex="1" borderRadius={8}>
-          <Flex mb="8" justify="space-between" align="center">
+          <Flex mb="8" flexDir="column">
             <Heading size="lg" fontWeight="normal">
-              Images
+              Upload
+            </Heading>
+            <Upload invalidateQuery="images" />
+            <Heading size="lg" fontWeight="normal">
+              Media
               {!isLoading && isFetching && (
                 <Spinner size="sm" color="gray.500" ml="4" />
               )}
             </Heading>
-            <NextLink href="/image/create" passHref>
-              <Button
-                as="a"
-                size="sm"
-                fontSize="sm"
-                colorScheme="pink"
-                leftIcon={<Icon as={RiAddLine} fontSize="20" />}
-              >
-                Adicionar
-              </Button>
-            </NextLink>
           </Flex>
-          <Dialog
-            title="Deletar"
-            description="Deseja realmente apagar esse usuário?"
-            isOpen={isOpen}
-            onClose={onClose}
-            onYesClick={() => handleDeleteUser(ClickedUserID)}
-          />
 
           {isLoading ? (
             <SimpleGrid
@@ -138,7 +87,14 @@ export default function ImageList() {
               align="flex-start"
             >
               {data.map((image: ImageProps) => {
-                return <ImageCard name={image.altName} url={image.url} />;
+                return (
+                  <ImageCard
+                    key={image.id}
+                    name={image.altName}
+                    url={image.url}
+                    onClick={() => handleClickImage(image.id)}
+                  />
+                );
               })}
             </SimpleGrid>
           )}

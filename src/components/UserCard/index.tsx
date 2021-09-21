@@ -5,7 +5,7 @@ interface UserCardProps {
   Name: string;
   Email: string;
   Enabled: boolean;
-  Role: number;
+  Role: string;
   avatarUrl?: string;
   onLeftButtonClick?: () => void;
   onRightButtonClick?: () => void;
@@ -14,6 +14,8 @@ interface UserCardProps {
 export function UserCard({
   Name,
   Email,
+  Role,
+  Enabled,
   avatarUrl = '',
   onRightButtonClick,
   onLeftButtonClick,
@@ -26,6 +28,7 @@ export function UserCard({
       borderRadius={8}
       pb="4"
       textAlign="center"
+      filter={!Enabled && 'brightness(0.5)'}
     >
       <Avatar
         size="xl"
@@ -56,7 +59,7 @@ export function UserCard({
         {Email}
       </Text>
       <Text textAlign="center" px={3}>
-        Administrador
+        {Role}
       </Text>
 
       <Stack mt={8} direction="row" spacing={4}>

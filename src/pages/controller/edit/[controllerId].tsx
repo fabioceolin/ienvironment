@@ -10,7 +10,6 @@ import {
   HStack,
   Button,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -19,22 +18,21 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
 
+import { Form } from 'components/Skeleton/Form';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
-import { Select } from 'components/Form/Select';
+import { TextArea } from 'components/Form/Textarea';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
 import { UsersProps } from 'hooks/useUsers';
-import { Role } from 'enums/Role';
-import { Form } from 'components/Skeleton/Form';
 
-type CreateUserFormData = {
+type CreateControllerFormData = {
   name: string;
   login: string;
-  email: string;
-  role: number;
+  password: string;
+  description?: string;
 };
 
 type User = UsersProps & {
@@ -49,21 +47,21 @@ const CreateUserFormSchema = yup.object().shape({
 
 export default function EditUser() {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<User>({} as User);
+  const [controller, setController] = useState<User>({} as User);
   const router = useRouter();
   const toast = useToast();
-  const { userId } = router.query;
+  const { controllerId } = router.query;
 
   const { register, handleSubmit, formState, setValue } = useForm({
     resolver: yupResolver(CreateUserFormSchema),
   });
 
   useEffect(() => {
-    if (userId) {
+    if (controllerId) {
       api
-        .get(`user?UserID=${userId}`)
+        .get(`MCUControllers/getById/${controllerId}`)
         .then((response) => {
-          setUser(response.data);
+          setController(response.data);
           setIsLoading(false);
         })
         .catch((error: AxiosError) => {
@@ -81,13 +79,16 @@ export default function EditUser() {
 
   //set hook forms value
   useEffect(() => {
-    setValue('name', user.name);
-    setValue('email', user.email);
-  }, [user]);
+    setValue('name', controller.name);
+    setValue('email', controller.email);
+  }, [controller]);
 
   const createUser = useMutation(
-    async (user: CreateUserFormData) => {
-      const response = await api.put(`user/edit/${userId}`, { ...user });
+    async (user: CreateControllerFormData) => {
+      const response = await api.put(
+        `MCUControllers/edit/{id}/${controllerId}`,
+        { ...user }
+      );
       return response.data.user;
     },
     {
@@ -118,7 +119,7 @@ export default function EditUser() {
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateUserFormData> = async (
+  const handleCreateUser: SubmitHandler<CreateControllerFormData> = async (
     values
   ) => {
     await createUser.mutateAsync(values);
@@ -156,18 +157,9 @@ export default function EditUser() {
               <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
                 <Input
                   name="name"
-                  label="Nome completo"
-                  defaultValue={user.name}
+                  label="Nome"
                   error={errors.name}
                   {...register('name')}
-                />
-                <Input
-                  name="email"
-                  type="email"
-                  label="E-mail"
-                  defaultValue={user.email}
-                  error={errors.email}
-                  {...register('email')}
                 />
               </SimpleGrid>
 
@@ -175,28 +167,25 @@ export default function EditUser() {
                 <Input
                   name="login"
                   label="Login"
-                  defaultValue={user.login}
                   error={errors.login}
-                  isDisabled
                   {...register('login')}
                 />
-                <Select
-                  name="role"
-                  label="Permissão"
-                  defaultValue={user.role}
-                  error={errors.role}
-                  {...register('role')}
-                >
-                  <option
-                    value={Role.Administrator}
-                    selected={user.role == Role.Administrator}
-                  >
-                    Administrator
-                  </option>
-                  <option value={Role.User} selected={user.role == Role.User}>
-                    User
-                  </option>
-                </Select>
+                <Input
+                  name="password"
+                  type="password"
+                  label="Senha"
+                  error={errors.password}
+                  {...register('password')}
+                />
+              </SimpleGrid>
+
+              <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+                <TextArea
+                  name="description"
+                  label="Descrição"
+                  error={errors.description}
+                  {...register('description')}
+                />
               </SimpleGrid>
             </VStack>
             <Flex mt="8" justify="flex-end">

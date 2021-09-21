@@ -21,54 +21,45 @@ import { useMutation } from 'react-query';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
-import { Select } from 'components/Form/Select';
+import { TextArea } from 'components/Form/Textarea';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
-import { role } from 'enums/role';
 
-type CreateUserFormData = {
+type CreateControllerFormData = {
   name: string;
   login: string;
-  email: string;
   password: string;
-  password_confirmation: string;
-  role: number;
+  description?: string;
 };
 
-const CreateUserFormSchema = yup.object().shape({
+const CreateControllerFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
   login: yup.string().required('Login obrigatório'),
-  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
-  password: yup
-    .string()
-    .required('Senha obrigatória')
-    .min(6, 'No minimo 6 caracteres'),
-  password_confirmation: yup
-    .string()
-    .oneOf([null, yup.ref('password')], 'As senhas precisam ser iguais'),
-  role: yup.number().required('Permissão obrigatória'),
+  password: yup.string().required('Senha obrigatória'),
 });
 
-export default function CreateUser() {
+export default function CreateController() {
   const router = useRouter();
   const toast = useToast();
-  const createUser = useMutation(
-    async (user: CreateUserFormData) => {
-      const response = await api.post('user/create', { ...user });
+  const createController = useMutation(
+    async (controller: CreateControllerFormData) => {
+      const response = await api.post('MCUControllers/create', {
+        ...controller,
+      });
       return response.data.user;
     },
     {
       onSuccess: () => {
         toast({
           title: 'Sucesso.',
-          description: 'Usuário criado.',
+          description: 'Ambiente criado.',
           status: 'success',
           position: 'top-right',
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('users');
+        queryClient.invalidateQueries('MCUControllers');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);
@@ -85,18 +76,17 @@ export default function CreateUser() {
   );
 
   const { register, handleSubmit, formState } = useForm({
-    resolver: yupResolver(CreateUserFormSchema),
+    resolver: yupResolver(CreateControllerFormSchema),
   });
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateUserFormData> = async (
-    values
-  ) => {
-    await createUser.mutateAsync(values);
+  const handleCreateController: SubmitHandler<CreateControllerFormData> =
+    async (values) => {
+      await createController.mutateAsync(values);
 
-    router.push('/users');
-  };
+      router.push('/controller');
+    };
 
   return (
     <Box>
@@ -114,10 +104,10 @@ export default function CreateUser() {
           borderRadius={8}
           bg="gray.800"
           p={['6', '8']}
-          onSubmit={handleSubmit(handleCreateUser)}
+          onSubmit={handleSubmit(handleCreateController)}
         >
           <Heading size="lg" fontWeight="normal">
-            Criar usuário
+            Adicionar ambiente
           </Heading>
 
           <Divider my="6" borderColor="gray.700" />
@@ -126,16 +116,9 @@ export default function CreateUser() {
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Input
                 name="name"
-                label="Nome completo"
+                label="Nome"
                 error={errors.name}
                 {...register('name')}
-              />
-              <Input
-                name="email"
-                type="email"
-                label="E-mail"
-                error={errors.email}
-                {...register('email')}
               />
             </SimpleGrid>
 
@@ -146,18 +129,6 @@ export default function CreateUser() {
                 error={errors.login}
                 {...register('login')}
               />
-              <Select
-                name="role"
-                label="Permissão"
-                error={errors.role}
-                {...register('role')}
-              >
-                <option value={role.Adm}>Administrator</option>
-                <option value={role.User}>User</option>
-              </Select>
-            </SimpleGrid>
-
-            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Input
                 name="password"
                 type="password"
@@ -165,19 +136,21 @@ export default function CreateUser() {
                 error={errors.password}
                 {...register('password')}
               />
-              <Input
-                name="password_confirmation"
-                type="password"
-                error={errors.password_confirmation}
-                label="Confirmação da senha"
-                {...register('password_confirmation')}
+            </SimpleGrid>
+
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <TextArea
+                name="description"
+                label="Descrição"
+                error={errors.description}
+                {...register('description')}
               />
             </SimpleGrid>
           </VStack>
 
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/controller" passHref>
                 <Button colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button

@@ -6,6 +6,7 @@ import { theme } from 'styles/theme';
 import { QueryClientProvider } from 'react-query';
 import { SidebarDrawerProvider } from 'contexts/SidebarDrawerContext';
 import { AuthProvider } from 'contexts/AuthContext';
+import { UploadProvider } from 'hooks/upload';
 import { queryClient } from 'services/queryClient';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -14,7 +15,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ChakraProvider theme={theme}>
         <AuthProvider>
           <SidebarDrawerProvider>
-            <Component {...pageProps} />
+            <UploadProvider>
+              <Component {...pageProps} />
+            </UploadProvider>
           </SidebarDrawerProvider>
         </AuthProvider>
       </ChakraProvider>

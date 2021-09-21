@@ -10,7 +10,6 @@ import {
   HStack,
   Button,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -19,26 +18,25 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
 
+import { Form } from 'components/Skeleton/Form';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
-import { Select } from 'components/Form/Select';
+import { TextArea } from 'components/Form/Textarea';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
-import { UsersProps } from 'hooks/useUsers';
-import { Role } from 'enums/Role';
-import { Form } from 'components/Skeleton/Form';
 
-type CreateUserFormData = {
+type CreateEnvironmentFormData = {
   name: string;
   login: string;
-  email: string;
-  role: number;
+  password: string;
+  description?: string;
 };
 
-type User = UsersProps & {
-  login: string;
+type Environment = {
+  name: string;
+  description: string;
 };
 
 const CreateUserFormSchema = yup.object().shape({
@@ -47,23 +45,25 @@ const CreateUserFormSchema = yup.object().shape({
   role: yup.number().required('Permissão obrigatória'),
 });
 
-export default function EditUser() {
+export default function EditEnvironment() {
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<User>({} as User);
+  const [environment, setEnvironment] = useState<Environment>(
+    {} as Environment
+  );
   const router = useRouter();
   const toast = useToast();
-  const { userId } = router.query;
+  const { environmentId } = router.query;
 
   const { register, handleSubmit, formState, setValue } = useForm({
     resolver: yupResolver(CreateUserFormSchema),
   });
 
   useEffect(() => {
-    if (userId) {
+    if (environmentId) {
       api
-        .get(`user?UserID=${userId}`)
+        .get(`Environment?EnvironmentID=${environmentId}`)
         .then((response) => {
-          setUser(response.data);
+          setEnvironment(response.data);
           setIsLoading(false);
         })
         .catch((error: AxiosError) => {
@@ -81,13 +81,16 @@ export default function EditUser() {
 
   //set hook forms value
   useEffect(() => {
-    setValue('name', user.name);
-    setValue('email', user.email);
-  }, [user]);
+    setValue('name', environment.name);
+    setValue('description', environment.description);
+  }, [environment]);
 
   const createUser = useMutation(
-    async (user: CreateUserFormData) => {
-      const response = await api.put(`user/edit/${userId}`, { ...user });
+    async (user: CreateEnvironmentFormData) => {
+      const response = await api.put(
+        `MCUControllers/edit/{id}/${environmentId}`,
+        { ...user }
+      );
       return response.data.user;
     },
     {
@@ -118,7 +121,7 @@ export default function EditUser() {
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateUserFormData> = async (
+  const handleCreateUser: SubmitHandler<CreateEnvironmentFormData> = async (
     values
   ) => {
     await createUser.mutateAsync(values);
@@ -148,7 +151,7 @@ export default function EditUser() {
             onSubmit={handleSubmit(handleCreateUser)}
           >
             <Heading size="lg" fontWeight="normal">
-              Editar usuário
+              Editar ambiente
             </Heading>
 
             <Divider my="6" borderColor="gray.700" />
@@ -156,52 +159,24 @@ export default function EditUser() {
               <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
                 <Input
                   name="name"
-                  label="Nome completo"
-                  defaultValue={user.name}
+                  label="Nome"
                   error={errors.name}
                   {...register('name')}
-                />
-                <Input
-                  name="email"
-                  type="email"
-                  label="E-mail"
-                  defaultValue={user.email}
-                  error={errors.email}
-                  {...register('email')}
                 />
               </SimpleGrid>
 
               <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-                <Input
-                  name="login"
-                  label="Login"
-                  defaultValue={user.login}
-                  error={errors.login}
-                  isDisabled
-                  {...register('login')}
+                <TextArea
+                  name="description"
+                  label="Descrição"
+                  error={errors.description}
+                  {...register('description')}
                 />
-                <Select
-                  name="role"
-                  label="Permissão"
-                  defaultValue={user.role}
-                  error={errors.role}
-                  {...register('role')}
-                >
-                  <option
-                    value={Role.Administrator}
-                    selected={user.role == Role.Administrator}
-                  >
-                    Administrator
-                  </option>
-                  <option value={Role.User} selected={user.role == Role.User}>
-                    User
-                  </option>
-                </Select>
               </SimpleGrid>
             </VStack>
             <Flex mt="8" justify="flex-end">
               <HStack spacing="4">
-                <Link href="/users" passHref>
+                <Link href="/environment" passHref>
                   <Button colorScheme="whiteAlpha">Cancelar</Button>
                 </Link>
                 <Button

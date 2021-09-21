@@ -7,6 +7,7 @@ import {
   RiContactsLine,
   RiRemoteControl2Line,
   RiHomeWifiLine,
+  RiUpload2Line,
 } from 'react-icons/ri';
 import { NavLink } from './NavLink';
 import { NavSection } from './NavSection';
@@ -18,6 +19,11 @@ export function SideBarNav() {
       <NavSection title="GERAL">
         <NavLink icon={RiDashboardLine} href="/dashboard">
           Dashboard
+        </NavLink>
+      </NavSection>
+      <NavSection title="MEDIA">
+        <NavLink icon={RiUpload2Line} href="/image">
+          Image
         </NavLink>
       </NavSection>
       <NavSection title="CONFIGURAÇÃO">

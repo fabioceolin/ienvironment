@@ -42,7 +42,7 @@ export default function EnvironmentList() {
   };
 
   const handleViewClick = (environmentID: string) => {
-    router.push(`environment/edit/${environmentID}`);
+    router.push(`environment/view/${environmentID}`);
   };
 
   const handleDeleteUser = async (environmentID: string) => {

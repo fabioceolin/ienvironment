@@ -25,7 +25,6 @@ import { queryClient } from 'services/queryClient';
 import { UserCard } from 'components/UserCard';
 import { Dialog } from 'components/Dialog';
 import { UserCardSkeleton } from 'components/Skeleton/UserCardSkeleton';
-import { Role } from 'enums/Role';
 
 export default function ControllerList() {
   const [ClickedControllerID, setClickedControllerID] = useState<string>('');
@@ -79,7 +78,7 @@ export default function ControllerList() {
   return (
     <Box>
       <Head>
-        <title>iE | Users</title>
+        <title>iE | Controller</title>
       </Head>
       <Header />
 

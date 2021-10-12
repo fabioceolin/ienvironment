@@ -18,7 +18,7 @@ import {
 import { api } from 'services/apiClient';
 
 import { RiAddLine } from 'react-icons/ri';
-import { Role } from 'enums/Role';
+import { Role } from 'utils/enums';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useUsers, UsersProps } from 'hooks/useUsers';

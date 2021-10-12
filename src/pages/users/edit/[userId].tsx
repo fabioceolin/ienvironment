@@ -10,7 +10,6 @@ import {
   HStack,
   Button,
   useToast,
-  Spinner,
 } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -23,11 +22,12 @@ import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
 import { Select } from 'components/Form/Select';
+import { Checkbox } from 'components/Form/Checkbox';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
 import { UsersProps } from 'hooks/useUsers';
-import { Role } from 'enums/Role';
+import { Role } from 'utils/enums';
 import { Form } from 'components/Skeleton/Form';
 
 type CreateUserFormData = {
@@ -41,10 +41,11 @@ type User = UsersProps & {
   login: string;
 };
 
-const CreateUserFormSchema = yup.object().shape({
+const EditUserFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
   email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
   role: yup.number().required('Permissão obrigatória'),
+  enabled: yup.boolean(),
 });
 
 export default function EditUser() {
@@ -55,7 +56,7 @@ export default function EditUser() {
   const { userId } = router.query;
 
   const { register, handleSubmit, formState, setValue } = useForm({
-    resolver: yupResolver(CreateUserFormSchema),
+    resolver: yupResolver(EditUserFormSchema),
   });
 
   useEffect(() => {
@@ -87,6 +88,7 @@ export default function EditUser() {
 
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
+      console.log(user);
       const response = await api.put(`user/edit/${userId}`, { ...user });
       return response.data.user;
     },
@@ -197,6 +199,15 @@ export default function EditUser() {
                     User
                   </option>
                 </Select>
+              </SimpleGrid>
+              <SimpleGrid w="100%" justifyContent="flex-end">
+                <Checkbox
+                  name="enabled"
+                  label="Habilitado"
+                  defaultChecked={user.enabled}
+                  error={errors.enabled}
+                  {...register('enabled')}
+                />
               </SimpleGrid>
             </VStack>
             <Flex mt="8" justify="flex-end">

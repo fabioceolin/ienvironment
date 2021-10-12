@@ -15,7 +15,7 @@ type WithSSRAuthProps = {
 export function withSSRAuth<P>(
   fn: GetServerSideProps<P>,
   options?: WithSSRAuthProps
-) {
+): GetServerSideProps {
   return async (
     ctx: GetServerSidePropsContext
   ): Promise<GetServerSidePropsResult<P>> => {

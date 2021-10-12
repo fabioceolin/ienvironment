@@ -107,10 +107,8 @@ export default function Dashboard() {
     </Flex>
   );
 }
-export const getServerSideProps = withSSRAuth(async (ctx) => {
-  const apiClient = setupAPIClient(ctx);
-  const response = await apiClient.get('user/me');
 
+export const getServerSideProps = withSSRAuth(async (ctx) => {
   return {
     props: {},
   };

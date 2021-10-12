@@ -22,6 +22,7 @@ import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
 import { TextArea } from 'components/Form/Textarea';
+import { Checkbox } from 'components/Form/Checkbox';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
@@ -144,6 +145,14 @@ export default function CreateController() {
                 label="Descrição"
                 error={errors.description}
                 {...register('description')}
+              />
+            </SimpleGrid>
+            <SimpleGrid w="100%" justifyContent="flex-end">
+              <Checkbox
+                name="enable"
+                label="Habilitado"
+                error={errors.enable}
+                {...register('enable')}
               />
             </SimpleGrid>
           </VStack>

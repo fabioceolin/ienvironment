@@ -1,25 +1,19 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
-import router from 'next/router';
-import NextLink from 'next/link';
 import {
   useDisclosure,
   Spinner,
   Flex,
   Text,
-  Icon,
   Box,
   Heading,
-  Button,
   SimpleGrid,
-  useToast,
 } from '@chakra-ui/react';
 
-import { api } from 'services/apiClient';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
-import { queryClient } from 'services/queryClient';
 import { UserCardSkeleton } from 'components/Skeleton/UserCardSkeleton';
 import { ImageCard } from 'components/ImageCard';
 import { ImageProps, useImages } from 'hooks/useImage';
@@ -103,3 +97,9 @@ export default function ImageList() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

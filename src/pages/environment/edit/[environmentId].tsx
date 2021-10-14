@@ -17,6 +17,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Form } from 'components/Skeleton/Form';
 import { Header } from 'components/Header';
@@ -210,3 +211,9 @@ export default function EditEnvironment() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

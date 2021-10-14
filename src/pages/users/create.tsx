@@ -17,6 +17,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
@@ -204,3 +205,9 @@ export default function CreateUser() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

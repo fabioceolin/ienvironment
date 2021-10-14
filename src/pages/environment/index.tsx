@@ -22,6 +22,7 @@ import { EnvironmentCard } from 'components/EnvironmentCard';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useEnvironment } from 'hooks/useEnvironments';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { RiAddLine } from 'react-icons/ri';
 import { queryClient } from 'services/queryClient';
@@ -152,3 +153,9 @@ export default function EnvironmentList() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

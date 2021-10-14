@@ -16,6 +16,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from 'react-query';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
@@ -279,3 +280,9 @@ export default function CreateSensor() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

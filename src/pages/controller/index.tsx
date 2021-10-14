@@ -18,6 +18,7 @@ import {
 import { api } from 'services/apiClient';
 
 import { RiAddLine } from 'react-icons/ri';
+import { withSSRAuth } from 'utils/withSSRAuth';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useMCUControllers } from 'hooks/useMCUControllers';
@@ -159,3 +160,9 @@ export default function ControllerList() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

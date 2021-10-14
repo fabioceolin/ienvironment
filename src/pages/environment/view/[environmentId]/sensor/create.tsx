@@ -31,7 +31,6 @@ import { TextArea } from 'components/Form/Textarea';
 
 type CreateSensorFormData = {
   measurementUnit: string;
-  defaultTriggersActive: boolean;
   limitUp: number;
   limitDown: number;
   name: string;
@@ -61,7 +60,6 @@ const CreateSensorFormSchema = yup.object().shape({
     .default(null),
   measurementUnit: yup.string().required('Unidade de medida obrigatória'),
   autoDisconnectSeconds: yup.number(),
-  defaultTriggersActive: yup.boolean(),
   simulationMode: yup.boolean(),
   enabled: yup.boolean(),
 });
@@ -237,14 +235,6 @@ export default function CreateSensor() {
             </SimpleGrid>
             <SimpleGrid w="100%" justifyContent="flex-end">
               <Flex>
-                <Checkbox
-                  name="defaultTriggersActive"
-                  label="Trigger padrão ativa???????"
-                  whiteSpace="nowrap"
-                  mr="15px"
-                  error={errors.defaultTriggersActive}
-                  {...register('defaultTriggersActive')}
-                />
                 <Checkbox
                   name="simulationMode"
                   label="Modo simulação"

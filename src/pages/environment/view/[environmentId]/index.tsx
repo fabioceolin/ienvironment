@@ -18,16 +18,12 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-  Table,
-  Thead,
-  Tr,
-  Tbody,
-  Th,
-  Td,
   ButtonGroup,
   IconButton,
   chakra,
   Link,
+  Tag,
+  Badge,
 } from '@chakra-ui/react';
 
 import { api } from 'services/apiClient';
@@ -49,6 +45,7 @@ import {
 } from 'react-icons/ri';
 import { withSSRAuth } from 'utils/withSSRAuth';
 import { setupAPIClient } from 'services/api';
+import { EquipmentCard } from 'components/EquipmentCard';
 
 type EnvironmentList = {
   environment: Environment;
@@ -167,113 +164,15 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                       >
                         {sensorData?.map((sensor) => {
                           return (
-                            <Box
-                              w="full"
-                              maxW="sm"
-                              mx="auto"
-                              px={4}
-                              py={3}
-                              bg="gray.800"
-                              shadow="md"
-                              rounded="lg"
-                            >
-                              <Flex
-                                justifyContent="space-between"
-                                alignItems="center"
-                              >
-                                <chakra.span fontSize="sm" color="gray.400">
-                                  Modo simulação
-                                </chakra.span>
-                                <chakra.span
-                                  bg="brand.300"
-                                  color="brand.900"
-                                  px={3}
-                                  py={1}
-                                  rounded="full"
-                                  textTransform="uppercase"
-                                  fontSize="xs"
-                                >
-                                  psychology
-                                </chakra.span>
-                              </Flex>
-
-                              <Box>
-                                <chakra.h1
-                                  fontSize="lg"
-                                  fontWeight="bold"
-                                  mt={2}
-                                  color="white"
-                                >
-                                  {sensor.name}
-                                </chakra.h1>
-                                <chakra.p
-                                  h="42px"
-                                  fontSize="sm"
-                                  mt={2}
-                                  color="gray.300"
-                                  noOfLines={2}
-                                >
-                                  {sensor.description}
-                                </chakra.p>
-                              </Box>
-
-                              <Box>
-                                <Flex
-                                  alignItems="center"
-                                  mt={2}
-                                  color="gray.200"
-                                >
-                                  <span>Visit on:</span>
-                                  <Link
-                                    mx={2}
-                                    cursor="pointer"
-                                    textDecor="underline"
-                                    color="brand.400"
-                                  >
-                                    edx.org
-                                  </Link>
-                                  <span>or</span>
-                                  <Link
-                                    mx={2}
-                                    cursor="pointer"
-                                    textDecor="underline"
-                                    color="brand.400"
-                                    wordBreak="break-word"
-                                  >
-                                    classcentral.com
-                                  </Link>
-                                </Flex>
-
-                                <Flex
-                                  alignItems="center"
-                                  justifyContent="center"
-                                  mt={4}
-                                >
-                                  <ButtonGroup
-                                    variant="solid"
-                                    size="sm"
-                                    spacing={3}
-                                  >
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="blue"
-                                      icon={<RiExternalLinkFill />}
-                                    />
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="green"
-                                      icon={<RiEdit2Fill />}
-                                    />
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="red"
-                                      variant="outline"
-                                      icon={<RiDeleteBinLine />}
-                                    />
-                                  </ButtonGroup>
-                                </Flex>
-                              </Box>
-                            </Box>
+                            <EquipmentCard
+                              title={sensor.name}
+                              description={sensor.description}
+                              title1="Limite inferior"
+                              value1={sensor.limitDown}
+                              title2="Limite superior"
+                              value2={sensor.limitUp}
+                              simulationMode={sensor.simulationMode}
+                            />
                           );
                         })}
                       </SimpleGrid>
@@ -322,113 +221,14 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                       >
                         {actuatorData?.map((actuator) => {
                           return (
-                            <Box
-                              w="full"
-                              maxW="sm"
-                              mx="auto"
-                              px={4}
-                              py={3}
-                              bg="gray.800"
-                              shadow="md"
-                              rounded="lg"
-                            >
-                              <Flex
-                                justifyContent="space-between"
-                                alignItems="center"
-                              >
-                                <chakra.span fontSize="sm" color="gray.400">
-                                  Modo simulação
-                                </chakra.span>
-                                <chakra.span
-                                  bg="brand.300"
-                                  color="brand.900"
-                                  px={3}
-                                  py={1}
-                                  rounded="full"
-                                  textTransform="uppercase"
-                                  fontSize="xs"
-                                >
-                                  psychology
-                                </chakra.span>
-                              </Flex>
-
-                              <Box>
-                                <chakra.h1
-                                  fontSize="lg"
-                                  fontWeight="bold"
-                                  mt={2}
-                                  color="white"
-                                >
-                                  {actuator.name}
-                                </chakra.h1>
-                                <chakra.p
-                                  h="42px"
-                                  fontSize="sm"
-                                  mt={2}
-                                  color="gray.300"
-                                  noOfLines={2}
-                                >
-                                  {actuator.description}
-                                </chakra.p>
-                              </Box>
-
-                              <Box>
-                                <Flex
-                                  alignItems="center"
-                                  mt={2}
-                                  color="gray.200"
-                                >
-                                  <span>Visit on:</span>
-                                  <Link
-                                    mx={2}
-                                    cursor="pointer"
-                                    textDecor="underline"
-                                    color="brand.400"
-                                  >
-                                    edx.org
-                                  </Link>
-                                  <span>or</span>
-                                  <Link
-                                    mx={2}
-                                    cursor="pointer"
-                                    textDecor="underline"
-                                    color="brand.400"
-                                    wordBreak="break-word"
-                                  >
-                                    classcentral.com
-                                  </Link>
-                                </Flex>
-
-                                <Flex
-                                  alignItems="center"
-                                  justifyContent="center"
-                                  mt={4}
-                                >
-                                  <ButtonGroup
-                                    variant="solid"
-                                    size="sm"
-                                    spacing={3}
-                                  >
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="blue"
-                                      icon={<RiExternalLinkFill />}
-                                    />
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="green"
-                                      icon={<RiEdit2Fill />}
-                                    />
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="red"
-                                      variant="outline"
-                                      icon={<RiDeleteBinLine />}
-                                    />
-                                  </ButtonGroup>
-                                </Flex>
-                              </Box>
-                            </Box>
+                            <EquipmentCard
+                              title={actuator.name}
+                              description={actuator.description}
+                              columnsSize={1}
+                              title1="Tópico"
+                              value1={actuator.topic}
+                              simulationMode={actuator.simulationMode}
+                            />
                           );
                         })}
                       </SimpleGrid>
@@ -477,113 +277,12 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                       >
                         {eventData?.map((event) => {
                           return (
-                            <Box
-                              w="full"
-                              maxW="sm"
-                              mx="auto"
-                              px={4}
-                              py={3}
-                              bg="gray.800"
-                              shadow="md"
-                              rounded="lg"
-                            >
-                              <Flex
-                                justifyContent="space-between"
-                                alignItems="center"
-                              >
-                                <chakra.span fontSize="sm" color="gray.400">
-                                  Modo simulação
-                                </chakra.span>
-                                <chakra.span
-                                  bg="brand.300"
-                                  color="brand.900"
-                                  px={3}
-                                  py={1}
-                                  rounded="full"
-                                  textTransform="uppercase"
-                                  fontSize="xs"
-                                >
-                                  psychology
-                                </chakra.span>
-                              </Flex>
-
-                              <Box>
-                                <chakra.h1
-                                  fontSize="lg"
-                                  fontWeight="bold"
-                                  mt={2}
-                                  color="white"
-                                >
-                                  {event.name}
-                                </chakra.h1>
-                                <chakra.p
-                                  h="42px"
-                                  fontSize="sm"
-                                  mt={2}
-                                  color="gray.300"
-                                  noOfLines={2}
-                                >
-                                  {event.description}
-                                </chakra.p>
-                              </Box>
-
-                              <Box>
-                                <Flex
-                                  alignItems="center"
-                                  mt={2}
-                                  color="gray.200"
-                                >
-                                  <span>Visit on:</span>
-                                  <Link
-                                    mx={2}
-                                    cursor="pointer"
-                                    textDecor="underline"
-                                    color="brand.400"
-                                  >
-                                    edx.org
-                                  </Link>
-                                  <span>or</span>
-                                  <Link
-                                    mx={2}
-                                    cursor="pointer"
-                                    textDecor="underline"
-                                    color="brand.400"
-                                    wordBreak="break-word"
-                                  >
-                                    classcentral.com
-                                  </Link>
-                                </Flex>
-
-                                <Flex
-                                  alignItems="center"
-                                  justifyContent="center"
-                                  mt={4}
-                                >
-                                  <ButtonGroup
-                                    variant="solid"
-                                    size="sm"
-                                    spacing={3}
-                                  >
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="blue"
-                                      icon={<RiExternalLinkFill />}
-                                    />
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="green"
-                                      icon={<RiEdit2Fill />}
-                                    />
-                                    <IconButton
-                                      aria-label=""
-                                      colorScheme="red"
-                                      variant="outline"
-                                      icon={<RiDeleteBinLine />}
-                                    />
-                                  </ButtonGroup>
-                                </Flex>
-                              </Box>
-                            </Box>
+                            <EquipmentCard
+                              title={event.name}
+                              description={event.description}
+                              columnsSize={1}
+                              runningDays={event.runningDays}
+                            />
                           );
                         })}
                       </SimpleGrid>

@@ -18,12 +18,7 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-  ButtonGroup,
   IconButton,
-  chakra,
-  Link,
-  Tag,
-  Badge,
 } from '@chakra-ui/react';
 
 import { api } from 'services/apiClient';
@@ -36,13 +31,7 @@ import { useActuatorsByEnvironmentId } from 'hooks/useActuator';
 import { useSensorsByEnvironmentId } from 'hooks/useSensor';
 import { Environment } from 'hooks/useEnvironments';
 
-import {
-  RiAddLine,
-  RiExternalLinkFill,
-  RiEdit2Fill,
-  RiDeleteBinLine,
-  RiArrowLeftLine,
-} from 'react-icons/ri';
+import { RiAddLine, RiArrowLeftLine } from 'react-icons/ri';
 import { withSSRAuth } from 'utils/withSSRAuth';
 import { setupAPIClient } from 'services/api';
 import { EquipmentCard } from 'components/EquipmentCard';
@@ -58,7 +47,17 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
   const toast = useToast();
   const router = useRouter();
 
-  const headers = ['name', 'description', 'actions'];
+  const handleEditSensorClick = (sensorID: string) => {
+    router.push(`./${environment.id}/sensor/edit/${sensorID}`);
+  };
+
+  const handleEditActuatorClick = (actuatorID: string) => {
+    router.push(`./${environment.id}/actuator/edit/${actuatorID}`);
+  };
+
+  const handleEditEventClick = (eventID: string) => {
+    router.push(`./${environment.id}/event/edit/${eventID}`);
+  };
 
   const {
     data: eventData,
@@ -81,13 +80,6 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
     error: actuatorError,
   } = useActuatorsByEnvironmentId(environment.id);
 
-  const newData =
-    eventData &&
-    eventData.map((event) => ({
-      name: event.name,
-      description: event.description,
-    }));
-
   return (
     <Box>
       <Head>
@@ -107,7 +99,7 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
               icon={<RiArrowLeftLine size={30} />}
               size="md"
               onClick={() => {
-                router.back();
+                router.push('/environment');
               }}
             />
             <Heading size="lg" fontWeight="normal">
@@ -172,6 +164,10 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               title2="Limite superior"
                               value2={sensor.limitUp}
                               simulationMode={sensor.simulationMode}
+                              enabled={sensor.enabled}
+                              onEditButtonClick={() =>
+                                handleEditSensorClick(sensor.id)
+                              }
                             />
                           );
                         })}
@@ -228,6 +224,10 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               title1="Tópico"
                               value1={actuator.topic}
                               simulationMode={actuator.simulationMode}
+                              enabled={actuator.enabled}
+                              onEditButtonClick={() =>
+                                handleEditActuatorClick(actuator.id)
+                              }
                             />
                           );
                         })}
@@ -282,6 +282,10 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               description={event.description}
                               columnsSize={1}
                               runningDays={event.runningDays}
+                              enabled={event.enabled}
+                              onEditButtonClick={() =>
+                                handleEditEventClick(event.id)
+                              }
                             />
                           );
                         })}

@@ -140,6 +140,7 @@ export default function EnvironmentList() {
                     key={environment.id}
                     title={environment.name}
                     description={environment.description}
+                    enabled={environment.enabled}
                     onDeleteButtonClick={() => handleOpenDialog(environment.id)}
                     onEditButtonClick={() => handleEditClick(environment.id)}
                     onViewButtonClick={() => handleViewClick(environment.id)}

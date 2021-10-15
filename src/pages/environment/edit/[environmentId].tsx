@@ -58,7 +58,7 @@ export default function EditEnvironment() {
   const toast = useToast();
   const { environmentId } = router.query;
 
-  const { register, handleSubmit, formState, setValue } = useForm({
+  const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(EditEnvironmentFormSchema),
   });
 
@@ -186,8 +186,8 @@ export default function EditEnvironment() {
                   name="enabled"
                   label="Habilitado"
                   defaultChecked={environment.enabled}
-                  error={errors.enable}
-                  {...register('enable')}
+                  error={errors.enabled}
+                  {...register('enabled')}
                 />
               </SimpleGrid>
             </VStack>

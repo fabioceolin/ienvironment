@@ -73,7 +73,7 @@ export default function CreateActuator() {
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('Sensors');
+        queryClient.invalidateQueries('Actuators');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);

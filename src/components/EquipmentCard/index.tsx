@@ -8,7 +8,9 @@ import {
   Tag,
   ButtonGroup,
   Badge,
+  Tooltip,
 } from '@chakra-ui/react';
+import React from 'react';
 
 import {
   RiDeleteBinLine,
@@ -27,6 +29,7 @@ interface EquipmentCardProps {
   value1?: string | number;
   title2?: string;
   value2?: string | number;
+  enabled: boolean;
   onViewButtonClick?: () => void;
   onEditButtonClick?: () => void;
   onDeleteButtonClick?: () => void;
@@ -42,6 +45,7 @@ export function EquipmentCard({
   value1,
   title2,
   value2,
+  enabled = true,
   onViewButtonClick,
   onEditButtonClick,
   onDeleteButtonClick,
@@ -56,6 +60,7 @@ export function EquipmentCard({
       bg="gray.800"
       shadow="md"
       rounded="lg"
+      filter={!enabled && 'brightness(0.5)'}
     >
       <Box>
         <Flex justifyContent="space-between">
@@ -136,22 +141,49 @@ export function EquipmentCard({
 
         <Flex alignItems="center" justifyContent="center" mt={4}>
           <ButtonGroup variant="solid" size="sm" spacing={3}>
-            <IconButton
-              aria-label=""
-              colorScheme="blue"
-              icon={<RiExternalLinkFill />}
-            />
-            <IconButton
-              aria-label=""
-              colorScheme="green"
-              icon={<RiEdit2Fill />}
-            />
-            <IconButton
-              aria-label=""
-              colorScheme="red"
-              variant="outline"
-              icon={<RiDeleteBinLine />}
-            />
+            <Tooltip
+              hasArrow
+              label="Visualizar"
+              bg="gray.400"
+              placement="bottom"
+              color="black"
+            >
+              <IconButton
+                aria-label=""
+                colorScheme="blue"
+                icon={<RiExternalLinkFill />}
+                onClick={onViewButtonClick}
+              />
+            </Tooltip>
+            <Tooltip
+              hasArrow
+              label="Editar"
+              bg="gray.400"
+              placement="bottom"
+              color="black"
+            >
+              <IconButton
+                aria-label=""
+                colorScheme="green"
+                icon={<RiEdit2Fill />}
+                onClick={onEditButtonClick}
+              />
+            </Tooltip>
+            <Tooltip
+              hasArrow
+              label="Remover"
+              bg="gray.400"
+              placement="bottom"
+              color="black"
+            >
+              <IconButton
+                aria-label=""
+                colorScheme="red"
+                variant="outline"
+                icon={<RiDeleteBinLine />}
+                onClick={onDeleteButtonClick}
+              />
+            </Tooltip>
           </ButtonGroup>
         </Flex>
       </Box>

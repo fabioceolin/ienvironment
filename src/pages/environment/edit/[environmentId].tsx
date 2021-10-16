@@ -108,7 +108,7 @@ export default function EditEnvironment() {
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('environment');
+        queryClient.invalidateQueries('environments');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);

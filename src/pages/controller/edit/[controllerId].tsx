@@ -34,6 +34,7 @@ type CreateControllerFormData = {
   login: string;
   password: string;
   description?: string;
+  enabled: boolean;
 };
 
 type Controller = {
@@ -47,8 +48,10 @@ type Controller = {
 
 const EditControllerFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
-  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
-  role: yup.number().required('Permissão obrigatória'),
+  login: yup.string().required('Login obrigatório'),
+  password: yup.string().required('Senha obrigatória'),
+  description: yup.string().nullable(),
+  enabled: yup.boolean(),
 });
 
 export default function EditController() {
@@ -58,7 +61,7 @@ export default function EditController() {
   const toast = useToast();
   const { controllerId } = router.query;
 
-  const { register, handleSubmit, formState, setValue } = useForm({
+  const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(EditControllerFormSchema),
   });
 
@@ -83,19 +86,14 @@ export default function EditController() {
     }
   }, []);
 
-  //set hook forms value
-  // useEffect(() => {
-  //   setValue('name', controller.name);
-  //   setValue('email', controller.email);
-  // }, [controller]);
-
-  const createUser = useMutation(
-    async (controller: CreateControllerFormData) => {
-      const response = await api.put(
-        `MCUControllers/edit/{id}/${controllerId}`,
-        { ...controller }
-      );
-      return response.data.user;
+  const editController = useMutation(
+    async (controllerForm: CreateControllerFormData) => {
+      if (controllerForm.password === controller.password)
+        controllerForm.password = null;
+      const response = await api.put(`MCUControllers/edit/${controllerId}`, {
+        ...controllerForm,
+      });
+      return response.data;
     },
     {
       onSuccess: () => {
@@ -125,10 +123,10 @@ export default function EditController() {
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateControllerFormData> = async (
+  const handleEditController: SubmitHandler<CreateControllerFormData> = async (
     values
   ) => {
-    await createUser.mutateAsync(values);
+    await editController.mutateAsync(values);
 
     router.push('/controller');
   };
@@ -152,7 +150,7 @@ export default function EditController() {
             borderRadius={8}
             bg="gray.800"
             p={['6', '8']}
-            onSubmit={handleSubmit(handleCreateUser)}
+            onSubmit={handleSubmit(handleEditController)}
           >
             <Heading size="lg" fontWeight="normal">
               Editar controlador
@@ -202,8 +200,8 @@ export default function EditController() {
                   name="enable"
                   label="Habilitado"
                   defaultChecked={controller.enabled}
-                  error={errors.enable}
-                  {...register('enable')}
+                  error={errors.enabled}
+                  {...register('enabled')}
                 />
               </SimpleGrid>
             </VStack>

@@ -157,6 +157,7 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                         {sensorData?.map((sensor) => {
                           return (
                             <EquipmentCard
+                              key={sensor.id}
                               title={sensor.name}
                               description={sensor.description}
                               title1="Limite inferior"
@@ -218,6 +219,7 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                         {actuatorData?.map((actuator) => {
                           return (
                             <EquipmentCard
+                              key={actuator.id}
                               title={actuator.name}
                               description={actuator.description}
                               columnsSize={1}
@@ -278,6 +280,7 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                         {eventData?.map((event) => {
                           return (
                             <EquipmentCard
+                              key={event.id}
                               title={event.name}
                               description={event.description}
                               columnsSize={1}

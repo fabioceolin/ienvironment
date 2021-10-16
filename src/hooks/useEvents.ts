@@ -38,8 +38,6 @@ export async function getEventsByEnvironmentId(
     `/Event/GetByEnvironmentId/${environmentId}`
   );
 
-  console.log(data);
-
   const Events = data.map((event) => {
     return {
       id: event.id,

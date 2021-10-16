@@ -186,7 +186,6 @@ export default function EditUser() {
                 <Select
                   name="role"
                   label="Permissão"
-                  defaultValue={user.role}
                   error={errors.role}
                   {...register('role')}
                 >

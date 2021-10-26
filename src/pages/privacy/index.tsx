@@ -1,7 +1,6 @@
-import { Text, Flex, Heading, UnorderedList, ListItem } from '@chakra-ui/react';
+import { GetStaticProps } from 'next';
 
-import { withSSRGuest } from 'utils/withSSRGuest';
-import { GetServerSideProps } from 'next';
+import { Text, Flex, Heading, UnorderedList, ListItem } from '@chakra-ui/react';
 
 export default function Privacy() {
   return (
@@ -149,10 +148,8 @@ export default function Privacy() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = withSSRGuest(
-  async (ctx) => {
-    return {
-      props: {},
-    };
-  }
-);
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  return {
+    props: {},
+  };
+};

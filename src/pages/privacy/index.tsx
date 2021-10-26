@@ -10,7 +10,7 @@ export default function Privacy() {
         maxWidth={1024}
         overflowY="auto"
         maxH="100vh"
-        p="50px 0"
+        p="50px 20px"
       >
         <Heading>Política Privacidade</Heading>
         <Text mt="15px">

@@ -17,43 +17,52 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Form } from 'components/Skeleton/Form';
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
 import { TextArea } from 'components/Form/Textarea';
+import { Checkbox } from 'components/Form/Checkbox';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
-import { UsersProps } from 'hooks/useUsers';
 
 type CreateControllerFormData = {
   name: string;
   login: string;
   password: string;
   description?: string;
+  enabled: boolean;
 };
 
-type User = UsersProps & {
+type Controller = {
+  id: string;
+  name: string;
+  description: string;
   login: string;
+  password: string;
+  enabled: boolean;
 };
 
-const CreateUserFormSchema = yup.object().shape({
+const EditControllerFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
-  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
-  role: yup.number().required('Permissão obrigatória'),
+  login: yup.string().required('Login obrigatório'),
+  password: yup.string().required('Senha obrigatória'),
+  description: yup.string().nullable(),
+  enabled: yup.boolean(),
 });
 
-export default function EditUser() {
+export default function EditController() {
   const [isLoading, setIsLoading] = useState(true);
-  const [controller, setController] = useState<User>({} as User);
+  const [controller, setController] = useState<Controller>({} as Controller);
   const router = useRouter();
   const toast = useToast();
   const { controllerId } = router.query;
 
-  const { register, handleSubmit, formState, setValue } = useForm({
-    resolver: yupResolver(CreateUserFormSchema),
+  const { register, handleSubmit, formState } = useForm({
+    resolver: yupResolver(EditControllerFormSchema),
   });
 
   useEffect(() => {
@@ -77,31 +86,26 @@ export default function EditUser() {
     }
   }, []);
 
-  //set hook forms value
-  useEffect(() => {
-    setValue('name', controller.name);
-    setValue('email', controller.email);
-  }, [controller]);
-
-  const createUser = useMutation(
-    async (user: CreateControllerFormData) => {
-      const response = await api.put(
-        `MCUControllers/edit/{id}/${controllerId}`,
-        { ...user }
-      );
-      return response.data.user;
+  const editController = useMutation(
+    async (controllerForm: CreateControllerFormData) => {
+      if (controllerForm.password === controller.password)
+        controllerForm.password = null;
+      const response = await api.put(`MCUControllers/edit/${controllerId}`, {
+        ...controllerForm,
+      });
+      return response.data;
     },
     {
       onSuccess: () => {
         toast({
           title: 'Sucesso.',
-          description: 'Usuário criado.',
+          description: 'Usuário atualizado.',
           status: 'success',
           position: 'top-right',
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('users');
+        queryClient.invalidateQueries('MCUControllers');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);
@@ -119,18 +123,18 @@ export default function EditUser() {
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateControllerFormData> = async (
+  const handleEditController: SubmitHandler<CreateControllerFormData> = async (
     values
   ) => {
-    await createUser.mutateAsync(values);
+    await editController.mutateAsync(values);
 
-    router.push('/users');
+    router.push('/controller');
   };
 
   return (
     <Box>
       <Head>
-        <title>iE | Edit user</title>
+        <title>iE | Edit controller</title>
       </Head>
       <Header />
 
@@ -146,10 +150,10 @@ export default function EditUser() {
             borderRadius={8}
             bg="gray.800"
             p={['6', '8']}
-            onSubmit={handleSubmit(handleCreateUser)}
+            onSubmit={handleSubmit(handleEditController)}
           >
             <Heading size="lg" fontWeight="normal">
-              Editar usuário
+              Editar controlador
             </Heading>
 
             <Divider my="6" borderColor="gray.700" />
@@ -158,6 +162,7 @@ export default function EditUser() {
                 <Input
                   name="name"
                   label="Nome"
+                  defaultValue={controller.name}
                   error={errors.name}
                   {...register('name')}
                 />
@@ -167,6 +172,7 @@ export default function EditUser() {
                 <Input
                   name="login"
                   label="Login"
+                  defaultValue={controller.login}
                   error={errors.login}
                   {...register('login')}
                 />
@@ -174,6 +180,7 @@ export default function EditUser() {
                   name="password"
                   type="password"
                   label="Senha"
+                  defaultValue={controller.password}
                   error={errors.password}
                   {...register('password')}
                 />
@@ -183,14 +190,24 @@ export default function EditUser() {
                 <TextArea
                   name="description"
                   label="Descrição"
+                  defaultValue={controller.description}
                   error={errors.description}
                   {...register('description')}
+                />
+              </SimpleGrid>
+              <SimpleGrid w="100%" justifyContent="flex-end">
+                <Checkbox
+                  name="enable"
+                  label="Habilitado"
+                  defaultChecked={controller.enabled}
+                  error={errors.enabled}
+                  {...register('enabled')}
                 />
               </SimpleGrid>
             </VStack>
             <Flex mt="8" justify="flex-end">
               <HStack spacing="4">
-                <Link href="/users" passHref>
+                <Link href="/controller" passHref>
                   <Button colorScheme="whiteAlpha">Cancelar</Button>
                 </Link>
                 <Button
@@ -208,3 +225,9 @@ export default function EditUser() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

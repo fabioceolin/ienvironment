@@ -17,6 +17,7 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Form } from 'components/Skeleton/Form';
 import { Header } from 'components/Header';
@@ -26,23 +27,26 @@ import { TextArea } from 'components/Form/Textarea';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
+import { Checkbox } from 'components/Form/Checkbox';
 
-type CreateEnvironmentFormData = {
+type EditEnvironmentFormData = {
   name: string;
   login: string;
   password: string;
   description?: string;
+  enabled: boolean;
 };
 
 type Environment = {
   name: string;
   description: string;
+  enabled: boolean;
 };
 
-const CreateUserFormSchema = yup.object().shape({
+const EditEnvironmentFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
-  email: yup.string().required('E-mail obrigatório').email('E-mail inválido'),
-  role: yup.number().required('Permissão obrigatória'),
+  description: yup.string(),
+  enabled: yup.boolean(),
 });
 
 export default function EditEnvironment() {
@@ -54,8 +58,8 @@ export default function EditEnvironment() {
   const toast = useToast();
   const { environmentId } = router.query;
 
-  const { register, handleSubmit, formState, setValue } = useForm({
-    resolver: yupResolver(CreateUserFormSchema),
+  const { register, handleSubmit, formState } = useForm({
+    resolver: yupResolver(EditEnvironmentFormSchema),
   });
 
   useEffect(() => {
@@ -80,30 +84,31 @@ export default function EditEnvironment() {
   }, []);
 
   //set hook forms value
-  useEffect(() => {
-    setValue('name', environment.name);
-    setValue('description', environment.description);
-  }, [environment]);
+  // useEffect(() => {
+  //   setValue('name', environment.name);
+  //   setValue('description', environment.description);
+  // }, [environment]);
 
-  const createUser = useMutation(
-    async (user: CreateEnvironmentFormData) => {
-      const response = await api.put(
-        `MCUControllers/edit/{id}/${environmentId}`,
-        { ...user }
-      );
+  const EditEnvironment = useMutation(
+    async (environment: EditEnvironmentFormData) => {
+      const response = await api.put(`/Environment/edit/${environmentId}`, {
+        ...environment,
+      });
+      console.log(environment);
+      console.log(response.data);
       return response.data.user;
     },
     {
       onSuccess: () => {
         toast({
           title: 'Sucesso.',
-          description: 'Usuário criado.',
+          description: 'Ambiente atualizado.',
           status: 'success',
           position: 'top-right',
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('users');
+        queryClient.invalidateQueries('environments');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);
@@ -121,18 +126,19 @@ export default function EditEnvironment() {
 
   const { errors } = formState;
 
-  const handleCreateUser: SubmitHandler<CreateEnvironmentFormData> = async (
+  const handleEditEnvironment: SubmitHandler<EditEnvironmentFormData> = async (
     values
   ) => {
-    await createUser.mutateAsync(values);
+    console.log(values);
+    await EditEnvironment.mutateAsync(values);
 
-    router.push('/users');
+    router.push('/environment');
   };
 
   return (
     <Box>
       <Head>
-        <title>iE | Edit user</title>
+        <title>iE | Edit environment</title>
       </Head>
       <Header />
 
@@ -148,7 +154,7 @@ export default function EditEnvironment() {
             borderRadius={8}
             bg="gray.800"
             p={['6', '8']}
-            onSubmit={handleSubmit(handleCreateUser)}
+            onSubmit={handleSubmit(handleEditEnvironment)}
           >
             <Heading size="lg" fontWeight="normal">
               Editar ambiente
@@ -160,6 +166,7 @@ export default function EditEnvironment() {
                 <Input
                   name="name"
                   label="Nome"
+                  defaultValue={environment.name}
                   error={errors.name}
                   {...register('name')}
                 />
@@ -169,8 +176,18 @@ export default function EditEnvironment() {
                 <TextArea
                   name="description"
                   label="Descrição"
+                  defaultValue={environment.description}
                   error={errors.description}
                   {...register('description')}
+                />
+              </SimpleGrid>
+              <SimpleGrid w="100%" justifyContent="flex-end">
+                <Checkbox
+                  name="enabled"
+                  label="Habilitado"
+                  defaultChecked={environment.enabled}
+                  error={errors.enabled}
+                  {...register('enabled')}
                 />
               </SimpleGrid>
             </VStack>
@@ -194,3 +211,9 @@ export default function EditEnvironment() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

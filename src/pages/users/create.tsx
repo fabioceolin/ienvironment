@@ -17,15 +17,17 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Link from 'next/link';
 import { useMutation } from 'react-query';
+import { withSSRAuth } from 'utils/withSSRAuth';
 
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { Input } from 'components/Form/Input';
 import { Select } from 'components/Form/Select';
+import { Checkbox } from 'components/Form/Checkbox';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
-import { Role } from 'enums/Role';
+import { Role } from 'utils/enums';
 
 type CreateUserFormData = {
   name: string;
@@ -173,6 +175,15 @@ export default function CreateUser() {
                 {...register('password_confirmation')}
               />
             </SimpleGrid>
+            <SimpleGrid w="100%" justifyContent="flex-end">
+              <Checkbox
+                name="enable"
+                label="Habilitado"
+                defaultChecked
+                error={errors.enable}
+                {...register('enable')}
+              />
+            </SimpleGrid>
           </VStack>
 
           <Flex mt="8" justify="flex-end">
@@ -194,3 +205,9 @@ export default function CreateUser() {
     </Box>
   );
 }
+
+export const getServerSideProps = withSSRAuth(async (ctx) => {
+  return {
+    props: {},
+  };
+});

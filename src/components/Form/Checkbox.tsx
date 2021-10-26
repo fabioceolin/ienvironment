@@ -1,0 +1,39 @@
+import {
+  Checkbox as ChakraCheckbox,
+  InputLeftElement,
+  FormLabel,
+  FormControl,
+  FormErrorMessage,
+  CheckboxProps as ChakraCheckboxProps,
+} from '@chakra-ui/react';
+import { forwardRef, ForwardRefRenderFunction } from 'react';
+import { FieldError } from 'react-hook-form';
+
+interface CheckboxProps extends ChakraCheckboxProps {
+  name: string;
+  label?: string;
+  error?: FieldError;
+}
+const CheckboxBase: ForwardRefRenderFunction<HTMLInputElement, CheckboxProps> =
+  ({ name, label, error = null, ...rest }, ref) => {
+    return (
+      <FormControl isInvalid={!!error}>
+        <ChakraCheckbox
+          id={name}
+          name={name}
+          p="10px"
+          rounded="8px"
+          colorScheme="pink"
+          bgColor="gray.900"
+          ref={ref}
+          {...rest}
+        >
+          {label}
+        </ChakraCheckbox>
+
+        {!!error && <FormErrorMessage>{error.message}</FormErrorMessage>}
+      </FormControl>
+    );
+  };
+
+export const Checkbox = forwardRef(CheckboxBase);

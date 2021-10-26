@@ -24,6 +24,7 @@ const MotionBox = motion<BoxProps>(Box);
 interface EnvironmentCardProps {
   title: string;
   description: string;
+  enabled: boolean;
   onViewButtonClick?: () => void;
   onEditButtonClick?: () => void;
   onDeleteButtonClick?: () => void;
@@ -32,6 +33,7 @@ interface EnvironmentCardProps {
 export function EnvironmentCard({
   title,
   description,
+  enabled,
   onViewButtonClick,
   onEditButtonClick,
   onDeleteButtonClick,
@@ -51,7 +53,7 @@ export function EnvironmentCard({
     },
   };
   return (
-    <Center py={4}>
+    <Center py={4} filter={!enabled && 'brightness(0.5)'}>
       <MotionBox
         h="100%"
         whileHover="hover"

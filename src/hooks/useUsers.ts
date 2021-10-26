@@ -1,4 +1,4 @@
-import { Role } from 'enums/Role';
+import { Role } from 'utils/enums';
 import { useQuery } from 'react-query';
 import { api } from 'services/apiClient';
 

@@ -23,18 +23,18 @@ export function SideBarNav() {
       </NavSection>
       <NavSection title="MEDIA">
         <NavLink icon={RiUpload2Line} href="/image">
-          Image
+          Imagem
         </NavLink>
       </NavSection>
       <NavSection title="CONFIGURAÇÃO">
         <NavLink icon={RiContactsLine} href="/users">
-          Users
+          Usuários
         </NavLink>
         <NavLink icon={RiHomeWifiLine} href="/environment">
-          Environment
+          Ambientes
         </NavLink>
         <NavLink icon={RiRemoteControl2Line} href="/controller">
-          Controller
+          Controlador
         </NavLink>
         <NavLink
           icon={RiLogoutBoxLine}

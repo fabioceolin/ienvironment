@@ -1,9 +1,11 @@
+import { ImageProps } from './useImage';
 import { useQuery } from 'react-query';
 import { api } from 'services/apiClient';
 
 export type Environment = {
   id: string;
   name: string;
+  img?: ImageProps;
   description: string;
   enabled: boolean;
   createdAt: string;

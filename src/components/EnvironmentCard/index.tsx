@@ -16,15 +16,13 @@ import { motion, Variants } from 'framer-motion';
 
 import { FiEdit3, FiX, FiMenu } from 'react-icons/fi';
 
-const IMAGE =
-  'https://www.lottehotel.com/content/dam/lotte-hotel/city/jeju/facilities/business/5350-151125-2000-fac-ltcj.jpg.thumb.768.768.jpg';
-
 const MotionBox = motion<BoxProps>(Box);
 
 interface EnvironmentCardProps {
   title: string;
   description: string;
   enabled: boolean;
+  imageUrl?: string;
   onViewButtonClick?: () => void;
   onEditButtonClick?: () => void;
   onDeleteButtonClick?: () => void;
@@ -34,6 +32,7 @@ export function EnvironmentCard({
   title,
   description,
   enabled,
+  imageUrl,
   onViewButtonClick,
   onEditButtonClick,
   onDeleteButtonClick,
@@ -81,8 +80,9 @@ export function EnvironmentCard({
             height={230}
             width={'100%'}
             objectFit={'cover'}
-            src={IMAGE}
-            fallbackSrc="https://via.placeholder.com/150"
+            src={imageUrl}
+            fallbackSrc="https://via.placeholder.com/300x230/?text=30
+            0%20x%20230"
           />
         </MotionBox>
         <Center>

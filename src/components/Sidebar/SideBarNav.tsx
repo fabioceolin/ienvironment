@@ -20,6 +20,9 @@ export function SideBarNav() {
         <NavLink icon={RiDashboardLine} href="/dashboard">
           Dashboard
         </NavLink>
+        <NavLink icon={RiDashboardLine} href="/history">
+          Histórico
+        </NavLink>
       </NavSection>
       <NavSection title="MEDIA">
         <NavLink icon={RiUpload2Line} href="/image">

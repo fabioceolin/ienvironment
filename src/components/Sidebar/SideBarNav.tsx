@@ -8,6 +8,7 @@ import {
   RiRemoteControl2Line,
   RiHomeWifiLine,
   RiUpload2Line,
+  RiHistoryFill,
 } from 'react-icons/ri';
 import { NavLink } from './NavLink';
 import { NavSection } from './NavSection';
@@ -19,6 +20,14 @@ export function SideBarNav() {
       <NavSection title="GERAL">
         <NavLink icon={RiDashboardLine} href="/dashboard">
           Dashboard
+        </NavLink>
+        <NavLink
+          icon={RiHistoryFill}
+          href="https://charts.mongodb.com/charts-project-0-fkdcx/embed/charts?id=f6252a88-6958-405f-b774-30e1cf49e7bf&maxDataAge=60&theme=dark&autoRefresh=false"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Histórico
         </NavLink>
       </NavSection>
       <NavSection title="MEDIA">

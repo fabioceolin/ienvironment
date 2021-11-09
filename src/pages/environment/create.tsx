@@ -10,6 +10,7 @@ import {
   HStack,
   Button,
   useToast,
+  Image,
 } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -109,6 +110,41 @@ export default function CreateEnvironment() {
           <Divider my="6" borderColor="gray.700" />
 
           <VStack spacing="8">
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Flex alignItems="center" mt={1}>
+                <Image
+                  src="https://source.unsplash.com/random"
+                  fallbackSrc="https://images.unsplash.com/photo-1462826303086-329426d1aef5"
+                  bg="gray.300"
+                  h={40}
+                  w={48}
+                  rounded="lg"
+                  shadow="md"
+                  objectFit="cover"
+                  objectPosition="center"
+                />
+                <Flex flexDir="column" ml={5} alignItems="flex-start">
+                  <Heading size="md">Selecione uma imagem</Heading>
+                  <Button
+                    mt={3}
+                    w="full"
+                    type="button"
+                    variant="outline"
+                    colorScheme="pink"
+                    size="sm"
+                    fontWeight="medium"
+                    transition="all 0.3s ease"
+                    _hover={{
+                      backgroundColor: 'pink.100',
+                    }}
+                    _focus={{ shadow: 'none' }}
+                  >
+                    Alterar
+                  </Button>
+                </Flex>
+              </Flex>
+            </SimpleGrid>
+
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Input
                 name="name"

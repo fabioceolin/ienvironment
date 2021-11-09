@@ -42,7 +42,7 @@ export default function Dashboard() {
         <Box flex="1">
           <Flex mb="8" justifyContent="space-between" align="center">
             <Heading size="lg" fontWeight="normal">
-              Ambientes
+              Dashboard
               {!isLoading && isFetching && (
                 <Spinner size="sm" color="gray.500" ml="4" />
               )}

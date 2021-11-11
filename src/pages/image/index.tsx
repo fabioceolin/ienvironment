@@ -76,7 +76,7 @@ export default function ImageList() {
             <SimpleGrid
               flex="1"
               gap="4"
-              columns={[1, null, 3, 4]}
+              columns={{ sm: 2, md: 3, xl: 5 }}
               templateRows="auto 1fr"
               align="flex-start"
             >
@@ -85,6 +85,7 @@ export default function ImageList() {
                   <ImageCard
                     key={image.id}
                     name={image.altName}
+                    hoverText="Detalhes"
                     url={image.url}
                     onClick={() => handleClickImage(image.id)}
                   />

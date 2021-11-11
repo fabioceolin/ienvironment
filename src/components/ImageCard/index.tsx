@@ -3,13 +3,15 @@ import { Box, Flex, Image, Text } from '@chakra-ui/react';
 
 interface ImageCardProps {
   name: string;
+  hoverText: string;
   url: string;
   onClick: () => void;
 }
 
 export function ImageCard({
   name,
-  url = 'https://images.unsplash.com/photo-1521903062400-b80f2cb8cb9d?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1050&q=80',
+  hoverText,
+  url = 'https://via.placeholder.com/300x230/?text=300%20x%20230',
   onClick,
 }: ImageCardProps) {
   return (
@@ -32,7 +34,7 @@ export function ImageCard({
         <Box pos="relative">
           <Image
             src={url}
-            fallbackSrc="https://images.unsplash.com/photo-1462826303086-329426d1aef5"
+            fallbackSrc="https://via.placeholder.com/300x230/?text=300%20x%20230"
             bg="gray.300"
             h={52}
             w="full"
@@ -56,7 +58,7 @@ export function ImageCard({
               display: 'flex',
             }}
           >
-            <Text>Detalhes</Text>
+            <Text>{hoverText}</Text>
           </Box>
         </Box>
 

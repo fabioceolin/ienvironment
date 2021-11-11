@@ -81,8 +81,7 @@ export function EnvironmentCard({
             width={'100%'}
             objectFit={'cover'}
             src={imageUrl}
-            fallbackSrc="https://via.placeholder.com/300x230/?text=30
-            0%20x%20230"
+            fallbackSrc="https://via.placeholder.com/300x230/?text=300%20x%20230"
           />
         </MotionBox>
         <Center>

@@ -20,7 +20,7 @@ import {
   ModalBody,
   ModalCloseButton,
 } from '@chakra-ui/react';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -51,6 +51,7 @@ type Environment = {
   name: string;
   description: string;
   enabled: boolean;
+  img?: ImageProps;
 };
 
 const EditEnvironmentFormSchema = yup.object().shape({
@@ -79,8 +80,9 @@ export default function EditEnvironment() {
     if (environmentId) {
       api
         .get(`Environment?EnvironmentID=${environmentId}`)
-        .then((response) => {
+        .then((response: AxiosResponse<Environment>) => {
           setEnvironment(response.data);
+          setImage(response.data.img);
           setIsLoading(false);
         })
         .catch((error: AxiosError) => {
@@ -215,7 +217,7 @@ export default function EditEnvironment() {
               <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
                 <Flex alignItems="center" mt={1}>
                   <Image
-                    src={image.url}
+                    src={image?.url}
                     fallbackSrc="https://via.placeholder.com/300x230/?text=300%20x%20230"
                     bg="gray.300"
                     h={40}

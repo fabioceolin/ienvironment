@@ -21,9 +21,6 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 
-import { api } from 'services/apiClient';
-import { queryClient } from 'services/queryClient';
-
 import { Header } from 'components/Header';
 import { Sidebar } from 'components/Sidebar';
 import { useEventsByEnvironmentId } from 'hooks/useEvents';
@@ -41,10 +38,6 @@ type EnvironmentList = {
 };
 
 export default function EnvironmentList({ environment }: EnvironmentList) {
-  const [ClickedEnvironmentID, setClickedEnvironmentID] = useState<string>('');
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
-  const toast = useToast();
   const router = useRouter();
 
   const handleEditSensorClick = (sensorID: string) => {

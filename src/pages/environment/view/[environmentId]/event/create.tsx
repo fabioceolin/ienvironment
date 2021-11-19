@@ -298,7 +298,9 @@ export default function CreateEvent({ environmentId }) {
                 <VStack
                   spacing="8"
                   w="100%"
-                  border="1px solid rgb(255,255,255,0.2)"
+                  p="10px 0"
+                  shadow="dark-lg"
+                  padding="10px"
                 >
                   <SimpleGrid
                     minChildWidth="240px"
@@ -430,119 +432,143 @@ export default function CreateEvent({ environmentId }) {
                     />
                   </SimpleGrid>
                 </VStack>
-                <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-                  <Select
-                    name="sensor1"
-                    label="Sensor"
-                    error={errors.sensor1}
-                    {...register('sensor1')}
+                <VStack
+                  spacing="8"
+                  w="100%"
+                  p="10px 0"
+                  shadow="dark-lg"
+                  padding="10px"
+                >
+                  <SimpleGrid
+                    minChildWidth="240px"
+                    spacing={['6', '8']}
+                    w="100%"
                   >
-                    <option value="">Selecione</option>
-                    {sensorIsLoading ? (
-                      <option disabled value={12}>
-                        Carregando...
+                    <Select
+                      name="sensor1"
+                      label="Sensor"
+                      error={errors.sensor1}
+                      {...register('sensor1')}
+                    >
+                      <option value="">Selecione</option>
+                      {sensorIsLoading ? (
+                        <option disabled value={12}>
+                          Carregando...
+                        </option>
+                      ) : sensorError ? (
+                        <option disabled value={123}>
+                          Erro ao obter os sensores
+                        </option>
+                      ) : (
+                        sensorData.map((sensor) => {
+                          console.log(sensor);
+                          return (
+                            <option key={sensor.id} value={sensor.id}>
+                              {sensor.name}
+                            </option>
+                          );
+                        })
+                      )}
+                    </Select>
+                    <Select
+                      name="comparator2"
+                      label="Comparador"
+                      error={errors.comparator2}
+                      {...register('comparator2')}
+                    >
+                      <option value={ComparatorType.Equals}>{'='}</option>
+                      <option value={ComparatorType.GreaterThan}>{'>'}</option>
+                      <option value={ComparatorType.LessThan}>{'<'}</option>
+                      <option value={ComparatorType.DifferentFrom}>
+                        {'!='}
                       </option>
-                    ) : sensorError ? (
-                      <option disabled value={123}>
-                        Erro ao obter os sensores
+                      <option value={ComparatorType.EqualOrLessThan}>
+                        {'<='}
                       </option>
-                    ) : (
-                      sensorData.map((sensor) => {
-                        console.log(sensor);
-                        return (
-                          <option key={sensor.id} value={sensor.id}>
-                            {sensor.name}
-                          </option>
-                        );
-                      })
-                    )}
-                  </Select>
-                  <Select
-                    name="comparator2"
-                    label="Comparador"
-                    error={errors.comparator2}
-                    {...register('comparator2')}
-                  >
-                    <option value={ComparatorType.Equals}>{'='}</option>
-                    <option value={ComparatorType.GreaterThan}>{'>'}</option>
-                    <option value={ComparatorType.LessThan}>{'<'}</option>
-                    <option value={ComparatorType.DifferentFrom}>{'!='}</option>
-                    <option value={ComparatorType.EqualOrLessThan}>
-                      {'<='}
-                    </option>
-                    <option value={ComparatorType.EqualOrGreaterThan}>
-                      {'>='}
-                    </option>
-                  </Select>
-                  <Input
-                    name="value1"
-                    label="Valor"
-                    error={errors.value1}
-                    {...register('value1')}
-                  />
-                </SimpleGrid>
-                <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-                  <Select
-                    name="grouping1"
-                    label="Proxima condição"
-                    error={errors.grouping1}
-                    {...register('grouping1')}
-                  >
-                    <option value={NextConditionType.And}>Ou</option>
-                    <option value={NextConditionType.Or}>E</option>
-                  </Select>
-                </SimpleGrid>
-                <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
-                  <Select
-                    name="sensor2"
-                    label="Sensor"
-                    error={errors.sensor2}
-                    {...register('sensor2')}
-                  >
-                    <option value="">Selecione</option>
-                    {sensorIsLoading ? (
-                      <option disabled value={12}>
-                        Carregando...
+                      <option value={ComparatorType.EqualOrGreaterThan}>
+                        {'>='}
                       </option>
-                    ) : sensorError ? (
-                      <option disabled value={123}>
-                        Erro ao obter os sensores
-                      </option>
-                    ) : (
-                      sensorData.map((sensor) => {
-                        console.log(sensor);
-                        return (
-                          <option key={sensor.id} value={sensor.id}>
-                            {sensor.name}
-                          </option>
-                        );
-                      })
-                    )}
-                  </Select>
-                  <Select
-                    name="comparator2"
-                    label="Comparador"
-                    error={errors.comparator2}
-                    {...register('comparator2')}
+                    </Select>
+                    <Input
+                      name="value1"
+                      label="Valor"
+                      error={errors.value1}
+                      {...register('value1')}
+                    />
+                  </SimpleGrid>
+                  <SimpleGrid
+                    minChildWidth="240px"
+                    spacing={['6', '8']}
+                    w="100%"
                   >
-                    <option value={ComparatorType.Equals}>{'='}</option>
-                    <option value={ComparatorType.GreaterThan}>{'>'}</option>
-                    <option value={ComparatorType.LessThan}>{'<'}</option>
-                    <option value={ComparatorType.DifferentFrom}>{'!='}</option>
-                    <option value={ComparatorType.EqualOrLessThan}>
-                      {'<='}
-                    </option>
-                    <option value={ComparatorType.EqualOrGreaterThan}>
-                      {'>='}
-                    </option>
-                  </Select>
-                  <Input
-                    name="value1"
-                    label="Valor"
-                    error={errors.value1}
-                    {...register('value1')}
-                  />
-                </SimpleGrid>
+                    <Select
+                      name="grouping1"
+                      label="Proxima condição"
+                      error={errors.grouping1}
+                      {...register('grouping1')}
+                    >
+                      <option value={NextConditionType.And}>Ou</option>
+                      <option value={NextConditionType.Or}>E</option>
+                    </Select>
+                  </SimpleGrid>
+                  <SimpleGrid
+                    minChildWidth="240px"
+                    spacing={['6', '8']}
+                    w="100%"
+                  >
+                    <Select
+                      name="sensor2"
+                      label="Sensor"
+                      error={errors.sensor2}
+                      {...register('sensor2')}
+                    >
+                      <option value="">Selecione</option>
+                      {sensorIsLoading ? (
+                        <option disabled value={12}>
+                          Carregando...
+                        </option>
+                      ) : sensorError ? (
+                        <option disabled value={123}>
+                          Erro ao obter os sensores
+                        </option>
+                      ) : (
+                        sensorData.map((sensor) => {
+                          console.log(sensor);
+                          return (
+                            <option key={sensor.id} value={sensor.id}>
+                              {sensor.name}
+                            </option>
+                          );
+                        })
+                      )}
+                    </Select>
+                    <Select
+                      name="comparator2"
+                      label="Comparador"
+                      error={errors.comparator2}
+                      {...register('comparator2')}
+                    >
+                      <option value={ComparatorType.Equals}>{'='}</option>
+                      <option value={ComparatorType.GreaterThan}>{'>'}</option>
+                      <option value={ComparatorType.LessThan}>{'<'}</option>
+                      <option value={ComparatorType.DifferentFrom}>
+                        {'!='}
+                      </option>
+                      <option value={ComparatorType.EqualOrLessThan}>
+                        {'<='}
+                      </option>
+                      <option value={ComparatorType.EqualOrGreaterThan}>
+                        {'>='}
+                      </option>
+                    </Select>
+                    <Input
+                      name="value1"
+                      label="Valor"
+                      error={errors.value1}
+                      {...register('value1')}
+                    />
+                  </SimpleGrid>
+                </VStack>
               </>
             )}
             <SimpleGrid w="100%" justifyContent="flex-end">

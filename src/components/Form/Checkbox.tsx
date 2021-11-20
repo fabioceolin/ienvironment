@@ -1,7 +1,5 @@
 import {
   Checkbox as ChakraCheckbox,
-  InputLeftElement,
-  FormLabel,
   FormControl,
   FormErrorMessage,
   CheckboxProps as ChakraCheckboxProps,
@@ -11,13 +9,14 @@ import { FieldError } from 'react-hook-form';
 
 interface CheckboxProps extends ChakraCheckboxProps {
   name: string;
+  formWidth?: string;
   label?: string;
   error?: FieldError;
 }
 const CheckboxBase: ForwardRefRenderFunction<HTMLInputElement, CheckboxProps> =
-  ({ name, label, error = null, ...rest }, ref) => {
+  ({ name, label, error = null, formWidth = '100%', ...rest }, ref) => {
     return (
-      <FormControl isInvalid={!!error}>
+      <FormControl width={formWidth} isInvalid={!!error}>
         <ChakraCheckbox
           id={name}
           name={name}

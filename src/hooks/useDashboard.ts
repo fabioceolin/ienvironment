@@ -61,6 +61,7 @@ export async function getDashboard(): Promise<Dashboard[]> {
 
 export function useDashboard() {
   return useQuery(['Dashboard'], () => getDashboard(), {
-    staleTime: 1000 * 60 * 1, // 2 minutos
+    staleTime: 1000 * 60 * 1, // 1 minutos
+    refetchInterval: 1000 * 60 * 1, // 1 minutos
   });
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import {
   Flex,
@@ -11,6 +11,14 @@ import {
   Button,
   useToast,
   Image,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from '@chakra-ui/react';
 import { AxiosError } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -28,10 +36,14 @@ import { Checkbox } from 'components/Form/Checkbox';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
+import { ImageProps, useImages } from 'hooks/useImage';
+import { ImageCard } from 'components/ImageCard';
 
 type CreateEnvironmentFormData = {
   name: string;
   description?: string;
+  img?: ImageProps;
+  enabled: boolean;
 };
 
 const CreateUserFormSchema = yup.object().shape({
@@ -39,12 +51,18 @@ const CreateUserFormSchema = yup.object().shape({
 });
 
 export default function CreateEnvironment() {
+  const [image, setImage] = useState<ImageProps>({} as ImageProps);
+  const { data } = useImages();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
   const toast = useToast();
   const createEnvironment = useMutation(
     async (environment: CreateEnvironmentFormData) => {
+      environment.img = image;
+      environment.img.updatedAt = '2021-10-05T14:48:00.000Z';
+      environment.img.createdAt = '2021-10-05T14:48:00.000Z';
       const response = await api.post('Environment/create', { ...environment });
-      return response.data.user;
+      return response.data;
     },
     {
       onSuccess: () => {
@@ -85,6 +103,11 @@ export default function CreateEnvironment() {
       router.push('/environment');
     };
 
+  const handleClickImage = (imageId: string) => {
+    setImage(data.find((image) => image.id === imageId));
+    onClose();
+  };
+
   return (
     <Box>
       <Head>
@@ -94,6 +117,41 @@ export default function CreateEnvironment() {
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
+
+        <Modal isOpen={isOpen} onClose={onClose} size="6xl">
+          <ModalOverlay />
+          <ModalContent bg="gray.800">
+            <ModalHeader>Escolha uma imagem</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <SimpleGrid
+                flex="1"
+                gap="4"
+                columns={{ sm: 2, md: 3, lg: 4, xl: 5 }}
+                templateRows="auto 1fr"
+                align="flex-start"
+              >
+                {data?.map((image: ImageProps) => {
+                  return (
+                    <ImageCard
+                      key={image.id}
+                      name={image.altName}
+                      hoverText="Selecionar"
+                      url={image.url}
+                      onClick={() => handleClickImage(image.id)}
+                    />
+                  );
+                })}
+              </SimpleGrid>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="pink" mr={3} onClick={onClose}>
+                Fechar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
         <Box
           as="form"
@@ -113,8 +171,8 @@ export default function CreateEnvironment() {
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Flex alignItems="center" mt={1}>
                 <Image
-                  src="https://source.unsplash.com/random"
-                  fallbackSrc="https://images.unsplash.com/photo-1462826303086-329426d1aef5"
+                  src={image.url}
+                  fallbackSrc="https://via.placeholder.com/300x230/?text=300%20x%20230"
                   bg="gray.300"
                   h={40}
                   w={48}
@@ -138,6 +196,7 @@ export default function CreateEnvironment() {
                       backgroundColor: 'pink.100',
                     }}
                     _focus={{ shadow: 'none' }}
+                    onClick={onOpen}
                   >
                     Alterar
                   </Button>
@@ -166,16 +225,16 @@ export default function CreateEnvironment() {
               <Checkbox
                 name="enable"
                 label="Habilitado"
-                checked
-                error={errors.enable}
-                {...register('enable')}
+                defaultChecked
+                error={errors.enabled}
+                {...register('enabled')}
               />
             </SimpleGrid>
           </VStack>
 
           <Flex mt="8" justify="flex-end">
             <HStack spacing="4">
-              <Link href="/users" passHref>
+              <Link href="/environment" passHref>
                 <Button colorScheme="whiteAlpha">Cancelar</Button>
               </Link>
               <Button

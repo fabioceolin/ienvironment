@@ -10,8 +10,17 @@ import {
   HStack,
   Button,
   useToast,
+  Image,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
 } from '@chakra-ui/react';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,13 +36,14 @@ import { TextArea } from 'components/Form/Textarea';
 import { api } from 'services/apiClient';
 import { queryClient } from 'services/queryClient';
 import { useRouter } from 'next/router';
+import { ImageProps, useImages } from 'hooks/useImage';
 import { Checkbox } from 'components/Form/Checkbox';
+import { ImageCard } from 'components/ImageCard';
 
 type EditEnvironmentFormData = {
   name: string;
-  login: string;
-  password: string;
   description?: string;
+  img?: ImageProps;
   enabled: boolean;
 };
 
@@ -41,6 +51,7 @@ type Environment = {
   name: string;
   description: string;
   enabled: boolean;
+  img?: ImageProps;
 };
 
 const EditEnvironmentFormSchema = yup.object().shape({
@@ -50,7 +61,10 @@ const EditEnvironmentFormSchema = yup.object().shape({
 });
 
 export default function EditEnvironment() {
+  const [image, setImage] = useState<ImageProps>({} as ImageProps);
   const [isLoading, setIsLoading] = useState(true);
+  const { data } = useImages();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [environment, setEnvironment] = useState<Environment>(
     {} as Environment
   );
@@ -66,8 +80,9 @@ export default function EditEnvironment() {
     if (environmentId) {
       api
         .get(`Environment?EnvironmentID=${environmentId}`)
-        .then((response) => {
+        .then((response: AxiosResponse<Environment>) => {
           setEnvironment(response.data);
+          setImage(response.data.img);
           setIsLoading(false);
         })
         .catch((error: AxiosError) => {
@@ -83,14 +98,11 @@ export default function EditEnvironment() {
     }
   }, []);
 
-  //set hook forms value
-  // useEffect(() => {
-  //   setValue('name', environment.name);
-  //   setValue('description', environment.description);
-  // }, [environment]);
-
   const EditEnvironment = useMutation(
     async (environment: EditEnvironmentFormData) => {
+      environment.img = image;
+      environment.img.updatedAt = '2021-10-05T14:48:00.000Z';
+      environment.img.createdAt = '2021-10-05T14:48:00.000Z';
       const response = await api.put(`/Environment/edit/${environmentId}`, {
         ...environment,
       });
@@ -135,6 +147,11 @@ export default function EditEnvironment() {
     router.push('/environment');
   };
 
+  const handleClickImage = (imageId: string) => {
+    setImage(data.find((image) => image.id === imageId));
+    onClose();
+  };
+
   return (
     <Box>
       <Head>
@@ -144,6 +161,41 @@ export default function EditEnvironment() {
 
       <Flex w="100%" my="6" maxW={1480} mx="auto" px="6">
         <Sidebar />
+
+        <Modal isOpen={isOpen} onClose={onClose} size="6xl">
+          <ModalOverlay />
+          <ModalContent bg="gray.800">
+            <ModalHeader>Escolha uma imagem</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <SimpleGrid
+                flex="1"
+                gap="4"
+                columns={{ sm: 2, md: 3, lg: 4, xl: 5 }}
+                templateRows="auto 1fr"
+                align="flex-start"
+              >
+                {data?.map((image: ImageProps) => {
+                  return (
+                    <ImageCard
+                      key={image.id}
+                      name={image.altName}
+                      hoverText="Selecionar"
+                      url={image.url}
+                      onClick={() => handleClickImage(image.id)}
+                    />
+                  );
+                })}
+              </SimpleGrid>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="pink" mr={3} onClick={onClose}>
+                Fechar
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
         {isLoading ? (
           <Form backgroundColor="gray.800" />
@@ -162,6 +214,41 @@ export default function EditEnvironment() {
 
             <Divider my="6" borderColor="gray.700" />
             <VStack spacing="8">
+              <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+                <Flex alignItems="center" mt={1}>
+                  <Image
+                    src={image?.url}
+                    fallbackSrc="https://via.placeholder.com/300x230/?text=300%20x%20230"
+                    bg="gray.300"
+                    h={40}
+                    w={48}
+                    rounded="lg"
+                    shadow="md"
+                    objectFit="cover"
+                    objectPosition="center"
+                  />
+                  <Flex flexDir="column" ml={5} alignItems="flex-start">
+                    <Heading size="md">Selecione uma imagem</Heading>
+                    <Button
+                      mt={3}
+                      w="full"
+                      type="button"
+                      variant="outline"
+                      colorScheme="pink"
+                      size="sm"
+                      fontWeight="medium"
+                      transition="all 0.3s ease"
+                      _hover={{
+                        backgroundColor: 'pink.100',
+                      }}
+                      _focus={{ shadow: 'none' }}
+                      onClick={onOpen}
+                    >
+                      Alterar
+                    </Button>
+                  </Flex>
+                </Flex>
+              </SimpleGrid>
               <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
                 <Input
                   name="name"

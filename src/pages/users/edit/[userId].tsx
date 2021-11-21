@@ -89,7 +89,6 @@ export default function EditUser() {
 
   const createUser = useMutation(
     async (user: CreateUserFormData) => {
-      console.log(user);
       const response = await api.put(`user/edit/${userId}`, { ...user });
       return response.data.user;
     },
@@ -106,7 +105,6 @@ export default function EditUser() {
         queryClient.invalidateQueries('users');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,

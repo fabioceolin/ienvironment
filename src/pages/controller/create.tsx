@@ -64,7 +64,6 @@ export default function CreateController() {
         queryClient.invalidateQueries('MCUControllers');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,

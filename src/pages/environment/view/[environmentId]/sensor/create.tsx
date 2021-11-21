@@ -73,7 +73,6 @@ export default function CreateSensor() {
   const createSensor = useMutation(
     async (sensor: CreateSensorFormData) => {
       sensor.environmentId = environmentId as string;
-      console.log(sensor);
       const response = await api.post('sensor/create', { ...sensor });
       return response.data;
     },
@@ -90,7 +89,6 @@ export default function CreateSensor() {
         queryClient.invalidateQueries('Sensors');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,

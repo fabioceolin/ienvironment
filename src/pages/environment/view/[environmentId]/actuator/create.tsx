@@ -59,7 +59,6 @@ export default function CreateActuator() {
   const createActuator = useMutation(
     async (actuator: CreateActuatorFormData) => {
       actuator.environmentId = environmentId as string;
-      console.log(actuator);
       const response = await api.post('actuator/create', { ...actuator });
       return response.data;
     },
@@ -76,7 +75,6 @@ export default function CreateActuator() {
         queryClient.invalidateQueries('Actuators');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,

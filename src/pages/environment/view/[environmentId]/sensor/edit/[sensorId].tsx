@@ -106,7 +106,6 @@ export default function EditSensor() {
   const editSensor = useMutation(
     async (sensorForm: EditSensorFormData) => {
       sensorForm.environmentId = environmentId as string;
-      console.log(sensorForm);
       const response = await api.put(`sensor/Update/${sensor.id}`, {
         ...sensorForm,
       });
@@ -125,7 +124,6 @@ export default function EditSensor() {
         queryClient.invalidateQueries('Sensors');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,

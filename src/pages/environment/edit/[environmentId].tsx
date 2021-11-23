@@ -106,9 +106,7 @@ export default function EditEnvironment() {
       const response = await api.put(`/Environment/edit/${environmentId}`, {
         ...environment,
       });
-      console.log(environment);
-      console.log(response.data);
-      return response.data.user;
+      return response.data;
     },
     {
       onSuccess: () => {
@@ -123,7 +121,6 @@ export default function EditEnvironment() {
         queryClient.invalidateQueries('environments');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,
@@ -141,7 +138,6 @@ export default function EditEnvironment() {
   const handleEditEnvironment: SubmitHandler<EditEnvironmentFormData> = async (
     values
   ) => {
-    console.log(values);
     await EditEnvironment.mutateAsync(values);
 
     router.push('/environment');

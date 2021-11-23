@@ -35,40 +35,47 @@ import {
 import { useSensorsByEnvironmentId } from 'hooks/useSensor';
 import { useActuatorsByEnvironmentId } from 'hooks/useActuator';
 import { TextArea } from 'components/Form/Textarea';
-import { number } from 'yup/lib/locale';
 
-type CreateSensorFormData = {
-  measurementUnit: string;
-  limitUp: number;
-  limitDown: number;
+type CreateEventFormData = {
   name: string;
   description: string;
-  entityType: number;
-  environmentId: string;
+  coolDownSeconds: number;
+  actuatorId: string;
+  actuatorValue: string;
+  value: string;
   enabled: boolean;
-  simulationMode: boolean;
-  microcontrollerID: string;
-  autoDisconnectSeconds: number;
+  startTime?: string;
+  endTime?: string;
+  sunday?: boolean;
+  monday?: boolean;
+  tuesday?: boolean;
+  wednesday?: boolean;
+  thursday?: boolean;
+  friday?: boolean;
+  saturday?: boolean;
+  sensorId?: string;
+  sensorValue?: string;
+  comparator?: number;
 };
 
-const CreateSensorFormSchema = yup.object().shape({
+const CreateEventFormSchema = yup.object().shape({
   name: yup.string().required('Nome obrigatório'),
   description: yup.string(),
-  microcontrollerID: yup.string().required('Microcontrolador obrigatório'),
-  entityType: yup.number().required('Tipo de dado obrigatório'),
-  limitUp: yup
-    .number()
-    .transform((v) => (isNaN(v) ? undefined : v))
-    .nullable()
-    .default(null),
-  limitDown: yup
-    .number()
-    .transform((v) => (isNaN(v) ? undefined : v))
-    .nullable()
-    .default(null),
-  measurementUnit: yup.string().required('Unidade de medida obrigatória'),
-  autoDisconnectSeconds: yup.number(),
-  simulationMode: yup.boolean(),
+  actuatorId: yup.string().required('Atuador obrigatório'),
+  actuatorValue: yup.string().required('Valor obrigatório para o atuador'),
+  coolDownSeconds: yup.number(),
+  startTime: yup
+    .string()
+    .matches(
+      /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+      'Formato incorreto de data e hora (hh:mm)'
+    ),
+  endTime: yup
+    .string()
+    .matches(
+      /^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/,
+      'Formato incorreto de data e hora (hh:mm)'
+    ),
   enabled: yup.boolean(),
 });
 
@@ -79,34 +86,108 @@ export default function CreateEvent({ environmentId }) {
   const {
     data: sensorData,
     isLoading: sensorIsLoading,
-    isFetching: sensorIsFetching,
     error: sensorError,
   } = useSensorsByEnvironmentId(environmentId);
 
   const {
     data: actuatorData,
     isLoading: actuatorIsLoading,
-    isFetching: actuatorIsFetching,
     error: actuatorError,
   } = useActuatorsByEnvironmentId(environmentId);
-  const createSensor = useMutation(
-    async (sensor: CreateSensorFormData) => {
-      sensor.environmentId = environmentId as string;
-      console.log(sensor);
-      const response = await api.post('sensor/create', { ...sensor });
+
+  const createEvent = useMutation(
+    async (event: CreateEventFormData) => {
+      let EventCreate;
+      switch (eventType) {
+        case EventType.Manual.toString():
+          EventCreate = {
+            name: event.name,
+            description: event.description,
+            isManual: eventType == EventType.Manual.toString(),
+            coolDownSeconds: event.coolDownSeconds,
+            environmentId: environmentId as string,
+            whatExecute: [
+              {
+                actuatorId: event.actuatorId,
+                value: event.actuatorValue,
+              },
+            ],
+            enabled: event.enabled,
+          };
+          break;
+
+        case EventType.Temporal.toString():
+          EventCreate = {
+            name: event.name,
+            description: event.description,
+            timeBased: eventType == EventType.Temporal.toString(),
+            coolDownSeconds: event.coolDownSeconds,
+            environmentId: environmentId as string,
+            whatExecute: [
+              {
+                actuatorId: event.actuatorId,
+                value: event.actuatorValue,
+              },
+            ],
+            runningDays: [
+              event.sunday,
+              event.monday,
+              event.tuesday,
+              event.wednesday,
+              event.thursday,
+              event.friday,
+              event.saturday,
+            ].filter(Boolean),
+            startTime: event.startTime,
+            endTime: event.endTime,
+            enabled: event.enabled,
+          };
+          break;
+
+        case EventType.Conditional.toString():
+          EventCreate = {
+            name: event.name,
+            description: event.description,
+            coolDownSeconds: event.coolDownSeconds,
+            environmentId: environmentId as string,
+            whenExecute: [
+              {
+                sensorId: event.sensorId,
+                value: event.sensorValue,
+                comparator: event.comparator,
+                nextCondition: 0,
+              },
+            ],
+            whatExecute: [
+              {
+                actuatorId: event.actuatorId,
+                value: event.actuatorValue,
+              },
+            ],
+            enabled: event.enabled,
+          };
+          break;
+
+        default:
+          break;
+      }
+
+      console.log(event);
+      console.log(EventCreate);
+      const response = await api.post('event/create', { ...EventCreate });
       return response.data;
     },
     {
       onSuccess: () => {
         toast({
           title: 'Sucesso.',
-          description: 'Sensor criado.',
+          description: 'Evento criado.',
           status: 'success',
           position: 'top-right',
           isClosable: true,
         });
 
-        queryClient.invalidateQueries('Sensors');
+        queryClient.invalidateQueries('Events');
       },
       onError: (error: AxiosError) => {
         console.log(error.request, error.response, error.config.data);
@@ -122,16 +203,16 @@ export default function CreateEvent({ environmentId }) {
     }
   );
 
-  const { register, handleSubmit, formState, setValue } = useForm({
-    resolver: yupResolver(CreateSensorFormSchema),
+  const { register, handleSubmit, formState } = useForm({
+    resolver: yupResolver(CreateEventFormSchema),
   });
 
   const { errors } = formState;
 
-  const handleCreateSensor: SubmitHandler<CreateSensorFormData> = async (
+  const handleCreateEvent: SubmitHandler<CreateEventFormData> = async (
     values
   ) => {
-    await createSensor.mutateAsync(values);
+    await createEvent.mutateAsync(values);
 
     router.back();
   };
@@ -152,15 +233,9 @@ export default function CreateEvent({ environmentId }) {
           borderRadius={8}
           bg="gray.800"
           p={['6', '8']}
-          onSubmit={handleSubmit(handleCreateSensor)}
+          onSubmit={handleSubmit(handleCreateEvent)}
         >
-          <Heading
-            size="lg"
-            fontWeight="normal"
-            onClick={() => {
-              console.log(eventType);
-            }}
-          >
+          <Heading size="lg" fontWeight="normal">
             Criar evento
           </Heading>
 
@@ -187,11 +262,12 @@ export default function CreateEvent({ environmentId }) {
 
             <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
               <Input
-                name="coolDown"
+                name="coolDownSeconds"
                 label="Cooldown (segundos)"
                 type="number"
-                error={errors.coolDown}
-                {...register('coolDown')}
+                defaultValue={0}
+                error={errors.coolDownSeconds}
+                {...register('coolDownSeconds')}
               />
               <Select
                 name="EventType"
@@ -211,16 +287,16 @@ export default function CreateEvent({ environmentId }) {
               <>
                 <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
                   <Input
-                    name="measurementUnit"
-                    label="Hora de inicio"
-                    error={errors.measurementUnit}
-                    {...register('measurementUnit')}
+                    name="startTime"
+                    label="Hora de inicio (hh:mm)"
+                    error={errors.startTime}
+                    {...register('startTime')}
                   />
                   <Input
-                    name="autoDisconnectSeconds"
-                    label="Hora de fim"
-                    error={errors.autoDisconnectSeconds}
-                    {...register('autoDisconnectSeconds')}
+                    name="endTime"
+                    label="Hora de fim (hh:mm)"
+                    error={errors.endTime}
+                    {...register('endTime')}
                   />
                 </SimpleGrid>
                 <SimpleGrid w="100%">
@@ -294,293 +370,92 @@ export default function CreateEvent({ environmentId }) {
             )}
 
             {eventType === '2' && (
-              <>
-                <VStack
-                  spacing="8"
-                  w="100%"
-                  p="10px 0"
-                  shadow="dark-lg"
-                  padding="10px"
+              <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+                <Select
+                  name="sensorId"
+                  label="Sensor"
+                  error={errors.sensorId}
+                  {...register('sensorId')}
                 >
-                  <SimpleGrid
-                    minChildWidth="240px"
-                    spacing={['6', '8']}
-                    w="100%"
-                  >
-                    <Select
-                      name="actuator1"
-                      label="Atuador"
-                      error={errors.actuator1}
-                      {...register('actuator1')}
-                    >
-                      <option value="">Selecione</option>
-                      {actuatorIsLoading ? (
-                        <option disabled value={12}>
-                          Carregando...
+                  <option value="">Selecione</option>
+                  {sensorIsLoading ? (
+                    <option disabled value={12}>
+                      Carregando...
+                    </option>
+                  ) : sensorError ? (
+                    <option disabled value={123}>
+                      Erro ao obter os sensores
+                    </option>
+                  ) : (
+                    sensorData.map((sensor) => {
+                      return (
+                        <option key={sensor.id} value={sensor.id}>
+                          {sensor.name}
                         </option>
-                      ) : actuatorError ? (
-                        <option disabled value={123}>
-                          Erro ao obter os atuadores
-                        </option>
-                      ) : (
-                        actuatorData.map((actuator) => {
-                          console.log(actuator);
-                          return (
-                            <option key={actuator.id} value={actuator.id}>
-                              {actuator.name}
-                            </option>
-                          );
-                        })
-                      )}
-                    </Select>
-                    <Select
-                      name="comparator1"
-                      label="Comparador"
-                      error={errors.comparator1}
-                      {...register('comparator1')}
-                    >
-                      <option value={ComparatorType.Equals}>{'='}</option>
-                      <option value={ComparatorType.GreaterThan}>{'>'}</option>
-                      <option value={ComparatorType.LessThan}>{'<'}</option>
-                      <option value={ComparatorType.DifferentFrom}>
-                        {'!='}
-                      </option>
-                      <option value={ComparatorType.EqualOrLessThan}>
-                        {'<='}
-                      </option>
-                      <option value={ComparatorType.EqualOrGreaterThan}>
-                        {'>='}
-                      </option>
-                    </Select>
-                    <Input
-                      name="value1"
-                      label="Valor"
-                      error={errors.value1}
-                      {...register('value1')}
-                    />
-                  </SimpleGrid>
-                  <SimpleGrid
-                    minChildWidth="240px"
-                    spacing={['6', '8']}
-                    w="100%"
-                  >
-                    <Select
-                      name="grouping1"
-                      label="Proxima condição"
-                      error={errors.grouping1}
-                      {...register('grouping1')}
-                    >
-                      <option value={NextConditionType.And}>Ou</option>
-                      <option value={NextConditionType.Or}>E</option>
-                    </Select>
-                  </SimpleGrid>
-                  <SimpleGrid
-                    minChildWidth="240px"
-                    spacing={['6', '8']}
-                    w="100%"
-                  >
-                    <Select
-                      name="actuator2"
-                      label="Atuador"
-                      error={errors.actuator2}
-                      {...register('actuator2')}
-                    >
-                      <option value="">Selecione</option>
-                      {actuatorIsLoading ? (
-                        <option disabled value={12}>
-                          Carregando...
-                        </option>
-                      ) : actuatorError ? (
-                        <option disabled value={123}>
-                          Erro ao obter os atuadores
-                        </option>
-                      ) : (
-                        actuatorData.map((actuator) => {
-                          console.log(actuator);
-                          return (
-                            <option key={actuator.id} value={actuator.id}>
-                              {actuator.name}
-                            </option>
-                          );
-                        })
-                      )}
-                    </Select>
-                    <Select
-                      name="comparator1"
-                      label="Comparador"
-                      error={errors.comparator1}
-                      {...register('comparator1')}
-                    >
-                      <option value={ComparatorType.Equals}>{'='}</option>
-                      <option value={ComparatorType.GreaterThan}>{'>'}</option>
-                      <option value={ComparatorType.LessThan}>{'<'}</option>
-                      <option value={ComparatorType.DifferentFrom}>
-                        {'!='}
-                      </option>
-                      <option value={ComparatorType.EqualOrLessThan}>
-                        {'<='}
-                      </option>
-                      <option value={ComparatorType.EqualOrGreaterThan}>
-                        {'>='}
-                      </option>
-                    </Select>
-                    <Input
-                      name="value1"
-                      label="Valor"
-                      error={errors.value1}
-                      {...register('value1')}
-                    />
-                  </SimpleGrid>
-                </VStack>
-                <VStack
-                  spacing="8"
-                  w="100%"
-                  p="10px 0"
-                  shadow="dark-lg"
-                  padding="10px"
+                      );
+                    })
+                  )}
+                </Select>
+                <Select
+                  name="comparator"
+                  label="Comparador"
+                  error={errors.comparator}
+                  {...register('comparator')}
                 >
-                  <SimpleGrid
-                    minChildWidth="240px"
-                    spacing={['6', '8']}
-                    w="100%"
-                  >
-                    <Select
-                      name="sensor1"
-                      label="Sensor"
-                      error={errors.sensor1}
-                      {...register('sensor1')}
-                    >
-                      <option value="">Selecione</option>
-                      {sensorIsLoading ? (
-                        <option disabled value={12}>
-                          Carregando...
-                        </option>
-                      ) : sensorError ? (
-                        <option disabled value={123}>
-                          Erro ao obter os sensores
-                        </option>
-                      ) : (
-                        sensorData.map((sensor) => {
-                          console.log(sensor);
-                          return (
-                            <option key={sensor.id} value={sensor.id}>
-                              {sensor.name}
-                            </option>
-                          );
-                        })
-                      )}
-                    </Select>
-                    <Select
-                      name="comparator2"
-                      label="Comparador"
-                      error={errors.comparator2}
-                      {...register('comparator2')}
-                    >
-                      <option value={ComparatorType.Equals}>{'='}</option>
-                      <option value={ComparatorType.GreaterThan}>{'>'}</option>
-                      <option value={ComparatorType.LessThan}>{'<'}</option>
-                      <option value={ComparatorType.DifferentFrom}>
-                        {'!='}
-                      </option>
-                      <option value={ComparatorType.EqualOrLessThan}>
-                        {'<='}
-                      </option>
-                      <option value={ComparatorType.EqualOrGreaterThan}>
-                        {'>='}
-                      </option>
-                    </Select>
-                    <Input
-                      name="value1"
-                      label="Valor"
-                      error={errors.value1}
-                      {...register('value1')}
-                    />
-                  </SimpleGrid>
-                  <SimpleGrid
-                    minChildWidth="240px"
-                    spacing={['6', '8']}
-                    w="100%"
-                  >
-                    <Select
-                      name="grouping1"
-                      label="Proxima condição"
-                      error={errors.grouping1}
-                      {...register('grouping1')}
-                    >
-                      <option value={NextConditionType.And}>Ou</option>
-                      <option value={NextConditionType.Or}>E</option>
-                    </Select>
-                  </SimpleGrid>
-                  <SimpleGrid
-                    minChildWidth="240px"
-                    spacing={['6', '8']}
-                    w="100%"
-                  >
-                    <Select
-                      name="sensor2"
-                      label="Sensor"
-                      error={errors.sensor2}
-                      {...register('sensor2')}
-                    >
-                      <option value="">Selecione</option>
-                      {sensorIsLoading ? (
-                        <option disabled value={12}>
-                          Carregando...
-                        </option>
-                      ) : sensorError ? (
-                        <option disabled value={123}>
-                          Erro ao obter os sensores
-                        </option>
-                      ) : (
-                        sensorData.map((sensor) => {
-                          console.log(sensor);
-                          return (
-                            <option key={sensor.id} value={sensor.id}>
-                              {sensor.name}
-                            </option>
-                          );
-                        })
-                      )}
-                    </Select>
-                    <Select
-                      name="comparator2"
-                      label="Comparador"
-                      error={errors.comparator2}
-                      {...register('comparator2')}
-                    >
-                      <option value={ComparatorType.Equals}>{'='}</option>
-                      <option value={ComparatorType.GreaterThan}>{'>'}</option>
-                      <option value={ComparatorType.LessThan}>{'<'}</option>
-                      <option value={ComparatorType.DifferentFrom}>
-                        {'!='}
-                      </option>
-                      <option value={ComparatorType.EqualOrLessThan}>
-                        {'<='}
-                      </option>
-                      <option value={ComparatorType.EqualOrGreaterThan}>
-                        {'>='}
-                      </option>
-                    </Select>
-                    <Input
-                      name="value1"
-                      label="Valor"
-                      error={errors.value1}
-                      {...register('value1')}
-                    />
-                  </SimpleGrid>
-                </VStack>
-              </>
+                  <option value={ComparatorType.Equals}>{'='}</option>
+                  <option value={ComparatorType.GreaterThan}>{'>'}</option>
+                  <option value={ComparatorType.LessThan}>{'<'}</option>
+                  <option value={ComparatorType.DifferentFrom}>{'!='}</option>
+                  <option value={ComparatorType.EqualOrLessThan}>{'<='}</option>
+                  <option value={ComparatorType.EqualOrGreaterThan}>
+                    {'>='}
+                  </option>
+                </Select>
+                <Input
+                  name="sensorValue"
+                  label="Valor"
+                  error={errors.sensorValue}
+                  {...register('sensorValue')}
+                />
+              </SimpleGrid>
             )}
+
+            <SimpleGrid minChildWidth="240px" spacing={['6', '8']} w="100%">
+              <Select
+                name="actuatorId"
+                label="Atuador"
+                error={errors.actuatorId}
+                {...register('actuatorId')}
+              >
+                <option value="">Selecione</option>
+                {actuatorIsLoading ? (
+                  <option disabled value={12}>
+                    Carregando...
+                  </option>
+                ) : actuatorError ? (
+                  <option disabled value={123}>
+                    Erro ao obter os atuadores
+                  </option>
+                ) : (
+                  actuatorData.map((actuator) => {
+                    return (
+                      <option key={actuator.id} value={actuator.id}>
+                        {actuator.name}
+                      </option>
+                    );
+                  })
+                )}
+              </Select>
+              <Input
+                name="actuatorValue"
+                label="Valor"
+                error={errors.actuatorValue}
+                {...register('actuatorValue')}
+              />
+            </SimpleGrid>
+
             <SimpleGrid w="100%" justifyContent="flex-end">
               <Flex>
-                <Checkbox
-                  name="simulationMode"
-                  label="Modo simulação"
-                  whiteSpace="nowrap"
-                  mr="15px"
-                  error={errors.simulationMode}
-                  {...register('simulationMode')}
-                />
                 <Checkbox
                   name="enabled"
                   label="Habilitado"

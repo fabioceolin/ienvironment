@@ -91,7 +91,6 @@ export default function EditActuator() {
   const editActuator = useMutation(
     async (actuatorForm: EditActuatorFormData) => {
       actuatorForm.environmentId = environmentId as string;
-      console.log(actuatorForm);
       const response = await api.put(`Actuator/Update?id=${actuator.id}`, {
         ...actuatorForm,
       });
@@ -110,7 +109,6 @@ export default function EditActuator() {
         queryClient.invalidateQueries('Actuators');
       },
       onError: (error: AxiosError) => {
-        console.log(error.request, error.response, error.config.data);
         toast({
           title: `Erro ${error.request.status}.`,
           description: error.message,

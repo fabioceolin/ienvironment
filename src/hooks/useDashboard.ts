@@ -1,4 +1,5 @@
 import { Sensor } from './useSensor';
+import { Event } from './useEvents';
 import { useQuery } from 'react-query';
 import { api } from 'services/apiClient';
 
@@ -6,6 +7,7 @@ export type Dashboard = {
   name: string;
   description: string;
   sensor: Sensor[];
+  events: Event[];
 };
 
 export async function getDashboard(): Promise<Dashboard[]> {
@@ -51,7 +53,42 @@ export async function getDashboard(): Promise<Dashboard[]> {
       };
     });
 
+    const Events = item.events.map((eventI) => {
+      return {
+        id: eventI.id,
+        name: eventI.name,
+        environmentID: eventI.environmentID,
+        coolDownSeconds: eventI.coolDownSeconds,
+        isManual: eventI.isManual,
+        description: eventI.description,
+        runningDays: eventI.runningDays,
+        startTime: eventI.startTime,
+        endTime: eventI.endTime,
+        enabled: eventI.enabled,
+        timeBased: eventI.timeBased,
+        whenExecute: eventI.whenExecute,
+        whatExecute: eventI.whatExecute,
+        createdAt: new Date(eventI.createdAt).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        updatedAt: new Date(eventI.updatedAt).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+      };
+    });
+
     item.sensor = Sensor;
+    item.events = Events;
 
     return item;
   });

@@ -4,6 +4,7 @@ import { AuthContext } from 'contexts/AuthContext';
 import {
   RiLogoutBoxLine,
   RiDashboardLine,
+  RiPlayList2Fill,
   RiContactsLine,
   RiRemoteControl2Line,
   RiHomeWifiLine,
@@ -20,6 +21,9 @@ export function SideBarNav() {
       <NavSection title="GERAL">
         <NavLink icon={RiDashboardLine} href="/dashboard">
           Dashboard
+        </NavLink>
+        <NavLink icon={RiPlayList2Fill} href="/events">
+          Evento
         </NavLink>
         <NavLink
           icon={RiHistoryFill}

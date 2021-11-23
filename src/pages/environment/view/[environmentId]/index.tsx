@@ -32,6 +32,9 @@ import { RiAddLine, RiArrowLeftLine } from 'react-icons/ri';
 import { withSSRAuth } from 'utils/withSSRAuth';
 import { setupAPIClient } from 'services/api';
 import { EquipmentCard } from 'components/EquipmentCard';
+import { Dialog } from 'components/Dialog';
+import { api } from 'services/apiClient';
+import { queryClient } from 'services/queryClient';
 
 type EnvironmentList = {
   environment: Environment;
@@ -39,6 +42,15 @@ type EnvironmentList = {
 
 export default function EnvironmentList({ environment }: EnvironmentList) {
   const router = useRouter();
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [clickedEquipmentId, setClickedEquipmentId] = useState<string>('');
+
+  const toast = useToast();
+
+  const handleOpenDialog = (equipmentID: string) => {
+    onOpen();
+    setClickedEquipmentId(equipmentID);
+  };
 
   const handleEditSensorClick = (sensorID: string) => {
     router.push(`./${environment.id}/sensor/edit/${sensorID}`);
@@ -50,6 +62,108 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
 
   const handleEditEventClick = (eventID: string) => {
     router.push(`./${environment.id}/event/edit/${eventID}`);
+  };
+
+  const handleDeleteSensor = async (sensorId: string) => {
+    if (!sensorId) {
+      toast({
+        title: 'Internal error.',
+        description: 'Falha ao obter o ID do sensor.',
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+      });
+    }
+
+    const response = await api.delete(`sensor/delete?id=${sensorId}`);
+
+    response.status == 200
+      ? toast({
+          title: 'Sucesso!',
+          description: 'Sensor apagado!',
+          status: 'success',
+          position: 'top-right',
+          isClosable: true,
+        })
+      : toast({
+          title: 'Internal error.',
+          description: 'Falha ao deletar o sensor.',
+          status: 'error',
+          position: 'top-right',
+          isClosable: true,
+        });
+
+    setClickedEquipmentId('');
+    queryClient.invalidateQueries('sensors');
+    onClose();
+  };
+
+  const handleDeleteActuator = async (actuatorId: string) => {
+    if (!actuatorId) {
+      toast({
+        title: 'Internal error.',
+        description: 'Falha ao obter o ID do atuador.',
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+      });
+    }
+
+    const response = await api.delete(`Actuator/Delete?id=${actuatorId}`);
+
+    response.status == 200
+      ? toast({
+          title: 'Sucesso!',
+          description: 'Atuador apagado!',
+          status: 'success',
+          position: 'top-right',
+          isClosable: true,
+        })
+      : toast({
+          title: 'Internal error.',
+          description: 'Falha ao deletar o atuador.',
+          status: 'error',
+          position: 'top-right',
+          isClosable: true,
+        });
+
+    setClickedEquipmentId('');
+    queryClient.invalidateQueries('actuators');
+    onClose();
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!eventId) {
+      toast({
+        title: 'Internal error.',
+        description: 'Falha ao obter o ID do evento.',
+        status: 'error',
+        position: 'top-right',
+        isClosable: true,
+      });
+    }
+
+    const response = await api.delete(`event/delete/${eventId}`);
+
+    response.status == 200
+      ? toast({
+          title: 'Sucesso!',
+          description: 'Evento apagado!',
+          status: 'success',
+          position: 'top-right',
+          isClosable: true,
+        })
+      : toast({
+          title: 'Internal error.',
+          description: 'Falha ao deletar o evento.',
+          status: 'error',
+          position: 'top-right',
+          isClosable: true,
+        });
+
+    setClickedEquipmentId('');
+    queryClient.invalidateQueries('events');
+    onClose();
   };
 
   const {
@@ -108,6 +222,13 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
               </TabList>
               <TabPanels>
                 <TabPanel>
+                  <Dialog
+                    title="Deletar"
+                    description="Deseja realmente apagar esse sensor?"
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onYesClick={() => handleDeleteSensor(clickedEquipmentId)}
+                  />
                   <Flex mb="8" justify="space-between" align="center">
                     <Heading size="md" fontWeight="normal" color="gray.500">
                       Sensores
@@ -162,6 +283,9 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               onEditButtonClick={() =>
                                 handleEditSensorClick(sensor.id)
                               }
+                              onDeleteButtonClick={() => {
+                                handleOpenDialog(sensor.id);
+                              }}
                             />
                           );
                         })}
@@ -170,6 +294,13 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                   </Flex>
                 </TabPanel>
                 <TabPanel>
+                  <Dialog
+                    title="Deletar"
+                    description="Deseja realmente apagar esse atuador?"
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onYesClick={() => handleDeleteActuator(clickedEquipmentId)}
+                  />
                   <Flex mb="8" justify="space-between" align="center">
                     <Heading size="md" fontWeight="normal" color="gray.500">
                       Atuadores
@@ -223,6 +354,9 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               onEditButtonClick={() =>
                                 handleEditActuatorClick(actuator.id)
                               }
+                              onDeleteButtonClick={() => {
+                                handleOpenDialog(actuator.id);
+                              }}
                             />
                           );
                         })}
@@ -231,6 +365,13 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                   </Flex>
                 </TabPanel>
                 <TabPanel>
+                  <Dialog
+                    title="Deletar"
+                    description="Deseja realmente apagar esse evento?"
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    onYesClick={() => handleDeleteEvent(clickedEquipmentId)}
+                  />
                   <Flex mb="8" justify="space-between" align="center">
                     <Heading size="md" fontWeight="normal" color="gray.500">
                       Eventos
@@ -282,6 +423,9 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               onEditButtonClick={() =>
                                 handleEditEventClick(event.id)
                               }
+                              onDeleteButtonClick={() => {
+                                handleOpenDialog(event.id);
+                              }}
                             />
                           );
                         })}

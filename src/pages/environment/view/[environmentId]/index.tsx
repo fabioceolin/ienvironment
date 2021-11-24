@@ -42,13 +42,37 @@ type EnvironmentList = {
 
 export default function EnvironmentList({ environment }: EnvironmentList) {
   const router = useRouter();
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const {
+    isOpen: isOpenSensor,
+    onClose: onCloseSensor,
+    onOpen: onOpenSensor,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenActuator,
+    onClose: onCloseActuator,
+    onOpen: onOpenActuator,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenEvent,
+    onClose: onCloseEvent,
+    onOpen: onOpenEvent,
+  } = useDisclosure();
   const [clickedEquipmentId, setClickedEquipmentId] = useState<string>('');
 
   const toast = useToast();
 
-  const handleOpenDialog = (equipmentID: string) => {
-    onOpen();
+  const handleOpenSensorDialog = (equipmentID: string) => {
+    onOpenSensor();
+    setClickedEquipmentId(equipmentID);
+  };
+
+  const handleOpenActuatorDialog = (equipmentID: string) => {
+    onOpenActuator();
+    setClickedEquipmentId(equipmentID);
+  };
+
+  const handleOpenEventDialog = (equipmentID: string) => {
+    onOpenEvent();
     setClickedEquipmentId(equipmentID);
   };
 
@@ -94,8 +118,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
         });
 
     setClickedEquipmentId('');
-    queryClient.invalidateQueries('sensors');
-    onClose();
+    queryClient.invalidateQueries('Sensors');
+    onCloseSensor();
   };
 
   const handleDeleteActuator = async (actuatorId: string) => {
@@ -128,8 +152,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
         });
 
     setClickedEquipmentId('');
-    queryClient.invalidateQueries('actuators');
-    onClose();
+    queryClient.invalidateQueries('Actuators');
+    onCloseActuator();
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -162,8 +186,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
         });
 
     setClickedEquipmentId('');
-    queryClient.invalidateQueries('events');
-    onClose();
+    queryClient.invalidateQueries('Events');
+    onCloseEvent();
   };
 
   const {
@@ -225,8 +249,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                   <Dialog
                     title="Deletar"
                     description="Deseja realmente apagar esse sensor?"
-                    isOpen={isOpen}
-                    onClose={onClose}
+                    isOpen={isOpenSensor}
+                    onClose={onCloseSensor}
                     onYesClick={() => handleDeleteSensor(clickedEquipmentId)}
                   />
                   <Flex mb="8" justify="space-between" align="center">
@@ -284,7 +308,7 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                                 handleEditSensorClick(sensor.id)
                               }
                               onDeleteButtonClick={() => {
-                                handleOpenDialog(sensor.id);
+                                handleOpenSensorDialog(sensor.id);
                               }}
                             />
                           );
@@ -297,8 +321,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                   <Dialog
                     title="Deletar"
                     description="Deseja realmente apagar esse atuador?"
-                    isOpen={isOpen}
-                    onClose={onClose}
+                    isOpen={isOpenActuator}
+                    onClose={onCloseActuator}
                     onYesClick={() => handleDeleteActuator(clickedEquipmentId)}
                   />
                   <Flex mb="8" justify="space-between" align="center">
@@ -355,7 +379,7 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                                 handleEditActuatorClick(actuator.id)
                               }
                               onDeleteButtonClick={() => {
-                                handleOpenDialog(actuator.id);
+                                handleOpenActuatorDialog(actuator.id);
                               }}
                             />
                           );
@@ -368,8 +392,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                   <Dialog
                     title="Deletar"
                     description="Deseja realmente apagar esse evento?"
-                    isOpen={isOpen}
-                    onClose={onClose}
+                    isOpen={isOpenEvent}
+                    onClose={onCloseEvent}
                     onYesClick={() => handleDeleteEvent(clickedEquipmentId)}
                   />
                   <Flex mb="8" justify="space-between" align="center">
@@ -420,11 +444,8 @@ export default function EnvironmentList({ environment }: EnvironmentList) {
                               columnsSize={1}
                               runningDays={event.runningDays}
                               enabled={event.enabled}
-                              onEditButtonClick={() =>
-                                handleEditEventClick(event.id)
-                              }
                               onDeleteButtonClick={() => {
-                                handleOpenDialog(event.id);
+                                handleOpenEventDialog(event.id);
                               }}
                             />
                           );

@@ -85,7 +85,7 @@ export default function ControllerList() {
 
       <Dialog
         title="Deletar"
-        description="Deseja realmente apagar esse usuário?"
+        description="Deseja realmente apagar esse controlador?"
         isOpen={isOpen}
         onClose={onClose}
         onYesClick={() => handleDeleteUser(ClickedControllerID)}

@@ -7,7 +7,6 @@ import {
   SimpleGrid,
   Tag,
   ButtonGroup,
-  Badge,
   Tooltip,
 } from '@chakra-ui/react';
 import React from 'react';
@@ -141,49 +140,55 @@ export function EquipmentCard({
 
         <Flex alignItems="center" justifyContent="center" mt={4}>
           <ButtonGroup variant="solid" size="sm" spacing={3}>
-            <Tooltip
-              hasArrow
-              label="Visualizar"
-              bg="gray.400"
-              placement="bottom"
-              color="black"
-            >
-              <IconButton
-                aria-label=""
-                colorScheme="blue"
-                icon={<RiExternalLinkFill />}
-                onClick={onViewButtonClick}
-              />
-            </Tooltip>
-            <Tooltip
-              hasArrow
-              label="Editar"
-              bg="gray.400"
-              placement="bottom"
-              color="black"
-            >
-              <IconButton
-                aria-label=""
-                colorScheme="green"
-                icon={<RiEdit2Fill />}
-                onClick={onEditButtonClick}
-              />
-            </Tooltip>
-            <Tooltip
-              hasArrow
-              label="Remover"
-              bg="gray.400"
-              placement="bottom"
-              color="black"
-            >
-              <IconButton
-                aria-label=""
-                colorScheme="red"
-                variant="outline"
-                icon={<RiDeleteBinLine />}
-                onClick={onDeleteButtonClick}
-              />
-            </Tooltip>
+            {onViewButtonClick && (
+              <Tooltip
+                hasArrow
+                label="Visualizar"
+                bg="gray.400"
+                placement="bottom"
+                color="black"
+              >
+                <IconButton
+                  aria-label=""
+                  colorScheme="blue"
+                  icon={<RiExternalLinkFill />}
+                  onClick={onViewButtonClick}
+                />
+              </Tooltip>
+            )}
+            {!!onEditButtonClick && (
+              <Tooltip
+                hasArrow
+                label="Editar"
+                bg="gray.400"
+                placement="bottom"
+                color="black"
+              >
+                <IconButton
+                  aria-label=""
+                  colorScheme="green"
+                  icon={<RiEdit2Fill />}
+                  onClick={onEditButtonClick}
+                />
+              </Tooltip>
+            )}
+            {onDeleteButtonClick && (
+              <Tooltip
+                hasArrow
+                label="Remover"
+                bg="gray.400"
+                placement="bottom"
+                color="black"
+              >
+                <IconButton
+                  aria-label=""
+                  colorScheme="red"
+                  variant="outline"
+                  icon={<RiDeleteBinLine />}
+                  onClick={onDeleteButtonClick}
+                />
+              </Tooltip>
+            )}
           </ButtonGroup>
         </Flex>
       </Box>
